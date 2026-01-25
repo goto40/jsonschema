@@ -10,6 +10,7 @@ use serde_json::{Map, Value};
 
 use super::CompilationResult;
 
+#[derive(Debug)]
 pub(crate) struct AnyOfValidator {
     schemas: Vec<SchemaNode>,
     location: Location,
@@ -134,6 +135,7 @@ impl Validate for AnyOfValidator {
 }
 
 /// Optimized validator for `anyOf` with a single subschema.
+#[derive(Debug)]
 pub(crate) struct SingleAnyOfValidator {
     node: SchemaNode,
     location: Location,

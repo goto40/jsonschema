@@ -1,6 +1,8 @@
 //! Building a JSON Schema validator.
 //! The main idea is to create a tree from the input JSON Schema. This tree will contain
 //! everything needed to perform such validation in runtime.
+use std::fmt::Debug;
+
 use crate::{
     error::{error, no_error, ErrorIterator},
     evaluation::{Annotations, ErrorDescription, Evaluation, EvaluationNode},
@@ -92,7 +94,7 @@ impl ValidationContext {
 ///
 /// - `is_valid` takes `LightweightContext`: Only cycle detection, zero path tracking overhead.
 /// - `validate`, `iter_errors`, `evaluate` take `ValidationContext`: Cycle detection + evaluation path tracking.
-pub(crate) trait Validate: Send + Sync {
+pub(crate) trait Validate: Send + Sync + Debug {
     fn iter_errors<'i>(
         &self,
         instance: &'i Value,
@@ -365,6 +367,11 @@ impl Validator {
     #[must_use]
     pub fn draft(&self) -> Draft {
         self.draft
+    }
+
+    #[must_use]
+    pub fn get_node(&self) -> &SchemaNode {
+        &self.root
     }
 }
 

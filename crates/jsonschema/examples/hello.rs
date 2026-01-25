@@ -1,4 +1,5 @@
 #![allow(clippy::print_stdout)]
+use jsonschema::Validator;
 use serde_json::{self, json};
 
 fn main() {
@@ -17,8 +18,9 @@ fn main() {
     )
     .unwrap();
     let validator = jsonschema::validator_for(&schema).unwrap();
-    //println!("Hello {validator:?}");
+    let tst = Validator::options().build(&schema).unwrap();
+    println!("Hello {:#?}", tst.get_node());
     let instance = json!({"color": "red", "size_cm": 5.2});
-    let evaluation = validator.evaluate(&instance);
+    let _evaluation = validator.evaluate(&instance);
     //println!("evaluation {evaluation:?}");
 }

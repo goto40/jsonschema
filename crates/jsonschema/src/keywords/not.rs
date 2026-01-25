@@ -8,6 +8,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct NotValidator {
     // needed only for error representation
     original: Value,

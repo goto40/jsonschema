@@ -9,6 +9,7 @@ use crate::{
 use serde_json::{json, Map, Number, Value};
 use std::str::FromStr;
 
+#[derive(Debug)]
 pub(crate) struct MultipleTypesValidator {
     types: JsonTypeSet,
     location: Location,
@@ -75,6 +76,7 @@ impl Validate for MultipleTypesValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct IntegerTypeValidator {
     location: Location,
 }

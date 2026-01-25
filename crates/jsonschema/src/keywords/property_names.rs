@@ -8,6 +8,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct PropertyNamesObjectValidator {
     node: SchemaNode,
 }
@@ -113,6 +114,7 @@ impl Validate for PropertyNamesObjectValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct PropertyNamesBooleanValidator {
     location: Location,
 }

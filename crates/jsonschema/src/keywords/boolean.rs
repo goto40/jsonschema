@@ -7,6 +7,7 @@ use crate::{
 };
 use serde_json::Value;
 
+#[derive(Debug)]
 pub(crate) struct FalseValidator {
     location: Location,
 }

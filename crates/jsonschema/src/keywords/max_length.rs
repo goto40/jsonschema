@@ -9,6 +9,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct MaxLengthValidator {
     limit: u64,
     location: Location,

@@ -25,7 +25,7 @@ use crate::{
 };
 use referencing::Uri;
 use serde_json::{Map, Value};
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
 /// # Schema example
 ///
@@ -42,6 +42,7 @@ use std::sync::Arc;
 ///     "bar": 6
 /// }
 /// ```
+#[derive(Debug)]
 pub(crate) struct AdditionalPropertiesValidator {
     node: SchemaNode,
 }
@@ -146,6 +147,7 @@ impl Validate for AdditionalPropertiesValidator {
 /// ```json
 /// {}
 /// ```
+#[derive(Debug)]
 pub(crate) struct AdditionalPropertiesFalseValidator {
     location: Location,
 }
@@ -203,6 +205,7 @@ impl Validate for AdditionalPropertiesFalseValidator {
 ///     "foo": "bar",
 /// }
 /// ```
+#[derive(Debug)]
 pub(crate) struct AdditionalPropertiesNotEmptyFalseValidator<M: PropertiesValidatorsMap> {
     properties: M,
     location: Location,
@@ -363,6 +366,7 @@ impl<M: PropertiesValidatorsMap> Validate for AdditionalPropertiesNotEmptyFalseV
 ///     "bar": 6
 /// }
 /// ```
+#[derive(Debug)]
 pub(crate) struct AdditionalPropertiesNotEmptyValidator<M: PropertiesValidatorsMap> {
     node: SchemaNode,
     properties: M,
@@ -515,7 +519,8 @@ impl<M: PropertiesValidatorsMap> Validate for AdditionalPropertiesNotEmptyValida
 ///     "bar": 8
 /// }
 /// ```
-pub(crate) struct AdditionalPropertiesWithPatternsValidator<R> {
+#[derive(Debug)]
+pub(crate) struct AdditionalPropertiesWithPatternsValidator<R: Debug> {
     node: SchemaNode,
     patterns: Vec<(R, SchemaNode)>,
     /// We need this because `compiler::compile` uses the additionalProperties keyword to compile
@@ -526,7 +531,7 @@ pub(crate) struct AdditionalPropertiesWithPatternsValidator<R> {
     pattern_keyword_absolute_location: Option<Arc<Uri<String>>>,
 }
 
-impl<R: RegexEngine> Validate for AdditionalPropertiesWithPatternsValidator<R> {
+impl<R: RegexEngine + Debug> Validate for AdditionalPropertiesWithPatternsValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Object(item) = instance {
             for (property, value) in item {
@@ -683,6 +688,7 @@ impl<R: RegexEngine> Validate for AdditionalPropertiesWithPatternsValidator<R> {
 ///     "x-baz-x": 8,
 /// }
 /// ```
+#[derive(Debug)]
 pub(crate) struct AdditionalPropertiesWithPatternsFalseValidator<R> {
     patterns: Vec<(R, SchemaNode)>,
     location: Location,
@@ -690,7 +696,7 @@ pub(crate) struct AdditionalPropertiesWithPatternsFalseValidator<R> {
     pattern_keyword_absolute_location: Option<Arc<Uri<String>>>,
 }
 
-impl<R: RegexEngine> Validate for AdditionalPropertiesWithPatternsFalseValidator<R> {
+impl<R: RegexEngine + Debug> Validate for AdditionalPropertiesWithPatternsFalseValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Object(item) = instance {
             for (property, value) in item {
@@ -870,13 +876,17 @@ impl<R: RegexEngine> Validate for AdditionalPropertiesWithPatternsFalseValidator
 ///     "bar": 42
 /// }
 /// ```
-pub(crate) struct AdditionalPropertiesWithPatternsNotEmptyValidator<M: PropertiesValidatorsMap, R> {
+#[derive(Debug)]
+pub(crate) struct AdditionalPropertiesWithPatternsNotEmptyValidator<
+    M: PropertiesValidatorsMap + Debug,
+    R: Debug,
+> {
     node: SchemaNode,
     properties: M,
     patterns: Vec<(R, SchemaNode)>,
 }
 
-impl<M: PropertiesValidatorsMap, R: RegexEngine> Validate
+impl<M: PropertiesValidatorsMap + Debug, R: RegexEngine + Debug> Validate
     for AdditionalPropertiesWithPatternsNotEmptyValidator<M, R>
 {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -1075,16 +1085,17 @@ impl<M: PropertiesValidatorsMap, R: RegexEngine> Validate
 ///     "x-baz-x": 8,
 /// }
 /// ```
+#[derive(Debug)]
 pub(crate) struct AdditionalPropertiesWithPatternsNotEmptyFalseValidator<
-    M: PropertiesValidatorsMap,
-    R,
+    M: PropertiesValidatorsMap + Debug,
+    R: Debug,
 > {
     properties: M,
     patterns: Vec<(R, SchemaNode)>,
     location: Location,
 }
 
-impl<M: PropertiesValidatorsMap, R: RegexEngine> Validate
+impl<M: PropertiesValidatorsMap + Debug, R: RegexEngine + Debug> Validate
     for AdditionalPropertiesWithPatternsNotEmptyFalseValidator<M, R>
 {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -1292,7 +1303,7 @@ fn compile_pattern_non_empty<'a, R>(
     schema: &'a Value,
 ) -> Option<CompilationResult<'a>>
 where
-    R: RegexEngine + 'static,
+    R: RegexEngine + Debug + 'static,
 {
     let kctx = ctx.new_at_location("additionalProperties");
     if map.len() < 40 {
@@ -1320,7 +1331,7 @@ fn compile_pattern_non_empty_false<'a, R>(
     patterns: Vec<(R, SchemaNode)>,
 ) -> Option<CompilationResult<'a>>
 where
-    R: RegexEngine + 'static,
+    R: RegexEngine + Debug + 'static,
 {
     let kctx = ctx.new_at_location("additionalProperties");
     if map.len() < 40 {

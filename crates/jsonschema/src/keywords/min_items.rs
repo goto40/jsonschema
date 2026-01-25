@@ -9,6 +9,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct MinItemsValidator {
     limit: u64,
     location: Location,

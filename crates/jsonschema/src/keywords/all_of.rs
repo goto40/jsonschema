@@ -10,6 +10,7 @@ use serde_json::{Map, Value};
 
 use super::CompilationResult;
 
+#[derive(Debug)]
 pub(crate) struct AllOfValidator {
     schemas: Vec<SchemaNode>,
 }
@@ -79,6 +80,7 @@ impl Validate for AllOfValidator {
         EvaluationResult::from_children(children)
     }
 }
+#[derive(Debug)]
 
 pub(crate) struct SingleValueAllOfValidator {
     node: SchemaNode,

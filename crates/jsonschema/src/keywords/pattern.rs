@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
 use crate::{
     compiler,
@@ -12,12 +12,13 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
-pub(crate) struct PatternValidator<R> {
+#[derive(Debug)]
+pub(crate) struct PatternValidator<R: Debug> {
     regex: Arc<R>,
     location: Location,
 }
 
-impl<R: RegexEngine> Validate for PatternValidator<R> {
+impl<R: RegexEngine + Debug> Validate for PatternValidator<R> {
     fn validate<'i>(
         &self,
         instance: &'i Value,

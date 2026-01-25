@@ -12,6 +12,7 @@ use serde_json::{Map, Value};
 
 use super::helpers::map_get_u64;
 
+#[derive(Debug)]
 pub(crate) struct ContainsValidator {
     node: SchemaNode,
 }
@@ -108,6 +109,7 @@ impl Validate for ContainsValidator {
 /// `minContains` validation. Used only if there is no `maxContains` present.
 ///
 /// Docs: <https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.4.5>
+#[derive(Debug)]
 pub(crate) struct MinContainsValidator {
     node: SchemaNode,
     min_contains: u64,
@@ -191,6 +193,7 @@ impl Validate for MinContainsValidator {
 /// `maxContains` validation. Used only if there is no `minContains` present.
 ///
 /// Docs: <https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.4.4>
+#[derive(Debug)]
 pub(crate) struct MaxContainsValidator {
     node: SchemaNode,
     max_contains: u64,
@@ -281,6 +284,7 @@ impl Validate for MaxContainsValidator {
 /// Docs:
 ///   `maxContains` - <https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.4.4>
 ///   `minContains` - <https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.6.4.5>
+#[derive(Debug)]
 pub(crate) struct MinMaxContainsValidator {
     node: SchemaNode,
     min_contains: u64,

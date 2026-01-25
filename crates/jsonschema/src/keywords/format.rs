@@ -1,5 +1,6 @@
 //! Validator for `format` keyword.
 use std::{
+    fmt::Debug,
     net::{Ipv4Addr, Ipv6Addr},
     str::FromStr,
     sync::Arc,
@@ -709,6 +710,7 @@ fn is_valid_uuid(uuid: &str) -> bool {
 macro_rules! format_validators {
     ($(($validator:ident, $format:expr, $validation_fn:ident)),+ $(,)?) => {
         $(
+            #[derive(Debug)]
             struct $validator {
                 location: Location,
             }
@@ -786,6 +788,7 @@ format_validators!(
 );
 
 // Custom EmailValidator that supports email options
+#[derive(Debug)]
 struct EmailValidator {
     location: Location,
     email_options: Option<EmailAddressOptions>,
@@ -834,6 +837,7 @@ impl Validate for EmailValidator {
 }
 
 // Custom IdnEmailValidator that supports email options
+#[derive(Debug)]
 struct IdnEmailValidator {
     location: Location,
     email_options: Option<EmailAddressOptions>,
@@ -881,6 +885,7 @@ impl Validate for IdnEmailValidator {
     }
 }
 
+#[derive(Debug)]
 struct CustomFormatValidator {
     location: Location,
     format_name: String,
@@ -931,11 +936,11 @@ impl Validate for CustomFormatValidator {
     }
 }
 
-pub(crate) trait Format: Send + Sync + 'static {
+pub(crate) trait Format: Send + Sync + Debug + 'static {
     fn is_valid(&self, value: &str) -> bool;
 }
 
-impl<F> Format for F
+impl<F: Debug> Format for F
 where
     F: Fn(&str) -> bool + Send + Sync + 'static,
 {

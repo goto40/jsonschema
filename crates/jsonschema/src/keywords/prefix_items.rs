@@ -11,6 +11,7 @@ use serde_json::{Map, Value};
 
 use super::CompilationResult;
 
+#[derive(Debug)]
 pub(crate) struct PrefixItemsValidator {
     schemas: Vec<SchemaNode>,
 }

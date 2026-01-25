@@ -10,6 +10,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct OneOfValidator {
     schemas: Vec<SchemaNode>,
     location: Location,
@@ -64,6 +65,7 @@ impl OneOfValidator {
 
 /// Optimized validator for `oneOf` with a single subschema.
 /// With exactly one schema, `oneOf` behaves identically to `anyOf`.
+#[derive(Debug)]
 pub(crate) struct SingleOneOfValidator {
     node: SchemaNode,
     location: Location,

@@ -9,6 +9,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct AdditionalItemsObjectValidator {
     node: SchemaNode,
     items_count: usize,
@@ -76,6 +77,8 @@ impl Validate for AdditionalItemsObjectValidator {
         }
     }
 }
+
+#[derive(Debug)]
 
 pub(crate) struct AdditionalItemsBooleanValidator {
     items_count: usize,

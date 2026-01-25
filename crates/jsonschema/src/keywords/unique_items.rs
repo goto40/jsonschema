@@ -97,6 +97,7 @@ pub(crate) fn is_unique(items: &[Value]) -> bool {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct UniqueItemsValidator {
     location: Location,
 }

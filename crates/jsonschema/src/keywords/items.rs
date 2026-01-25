@@ -10,6 +10,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct ItemsArrayValidator {
     items: Vec<SchemaNode>,
 }
@@ -95,6 +96,7 @@ impl Validate for ItemsArrayValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct ItemsObjectValidator {
     node: SchemaNode,
 }
@@ -178,6 +180,7 @@ impl Validate for ItemsObjectValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct ItemsObjectSkipPrefixValidator {
     node: SchemaNode,
     skip_prefix: usize,

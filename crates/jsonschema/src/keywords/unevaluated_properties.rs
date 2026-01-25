@@ -559,6 +559,7 @@ fn compile_dependent<'a>(
 }
 
 /// Validator for the `unevaluatedProperties` keyword.
+#[derive(Debug)]
 pub(crate) struct UnevaluatedPropertiesValidator {
     location: Location,
     validators: PropertyValidators,

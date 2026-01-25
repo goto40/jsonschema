@@ -14,7 +14,11 @@ use ahash::AHashMap;
 use email_address::Options as EmailAddressOptions;
 use referencing::{Draft, Resource, Retrieve};
 use serde_json::Value;
-use std::{fmt, marker::PhantomData, sync::Arc};
+use std::{
+    fmt::{self, Debug},
+    marker::PhantomData,
+    sync::Arc,
+};
 
 /// Configuration options for JSON Schema validation.
 #[derive(Clone)]
@@ -395,7 +399,7 @@ impl<R> ValidationOptions<R> {
     pub fn with_format<N, F>(mut self, name: N, format: F) -> Self
     where
         N: Into<String>,
-        F: Fn(&str) -> bool + Send + Sync + 'static,
+        F: Fn(&str) -> bool + Send + Sync + Debug + 'static,
     {
         self.formats.insert(name.into(), Arc::new(format));
         self

@@ -16,7 +16,7 @@ use std::{
 
 /// A node in the schema tree, returned by `compiler::compile`
 #[derive(Clone, Debug)]
-pub(crate) struct SchemaNode {
+pub struct SchemaNode {
     validators: Arc<NodeValidators>,
     location: Location,
     absolute_path: Option<Arc<Uri<String>>>,
@@ -60,7 +60,7 @@ impl fmt::Debug for NodeValidators {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Boolean { .. } => f.debug_struct("Boolean").finish(),
-            Self::Keyword(_) => f.debug_tuple("Keyword").finish(),
+            Self::Keyword(a) => f.debug_tuple("Keyword").field(a).finish(),
             Self::Array { .. } => f.debug_struct("Array").finish(),
         }
     }
@@ -75,10 +75,29 @@ struct KeywordValidators {
     validators: Vec<KeywordValidatorEntry>,
 }
 
+impl fmt::Debug for KeywordValidators {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("KeywordValidators")
+            .field("unmatched_keywords", &self.unmatched_keywords)
+            .field("validators", &self.validators)
+            .finish()
+    }
+}
+
 struct KeywordValidatorEntry {
     validator: BoxedValidator,
     location: Location,
     absolute_location: Option<Arc<Uri<String>>>,
+}
+
+impl fmt::Debug for KeywordValidatorEntry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("KeywordValidatorEntry")
+            .field("validator", &self.validator)
+            .field("location", &self.location)
+            .field("absolute_location", &self.absolute_location)
+            .finish()
+    }
 }
 
 struct ArrayValidatorEntry {

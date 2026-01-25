@@ -8,6 +8,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct RequiredValidator {
     required: Vec<String>,
     location: Location,
@@ -100,6 +101,7 @@ impl Validate for RequiredValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct SingleItemRequiredValidator {
     value: String,
     location: Location,

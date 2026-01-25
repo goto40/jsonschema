@@ -504,6 +504,7 @@ fn compile_one_of<'a>(
 }
 
 /// Validator for the `unevaluatedItems` keyword.
+#[derive(Debug)]
 pub(crate) struct UnevaluatedItemsValidator {
     location: Location,
     validators: ItemsValidators,

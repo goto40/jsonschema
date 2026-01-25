@@ -10,6 +10,7 @@ use serde_json::{Map, Number, Value};
 
 use crate::paths::{LazyLocation, RefTracker};
 
+#[derive(Debug)]
 struct ConstArrayValidator {
     value: Vec<Value>,
     location: Location,
@@ -54,6 +55,7 @@ impl Validate for ConstArrayValidator {
     }
 }
 
+#[derive(Debug)]
 struct ConstBooleanValidator {
     value: bool,
     location: Location,
@@ -95,6 +97,7 @@ impl Validate for ConstBooleanValidator {
     }
 }
 
+#[derive(Debug)]
 struct ConstNullValidator {
     location: Location,
 }
@@ -129,6 +132,7 @@ impl Validate for ConstNullValidator {
     }
 }
 
+#[derive(Debug)]
 struct ConstNumberValidator {
     // This is saved in order to ensure that the error message is not altered by precision loss
     original_value: Number,
@@ -176,6 +180,7 @@ impl Validate for ConstNumberValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct ConstObjectValidator {
     value: Map<String, Value>,
     location: Location,
@@ -222,6 +227,7 @@ impl Validate for ConstObjectValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct ConstStringValidator {
     value: String,
     location: Location,

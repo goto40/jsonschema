@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
 use crate::{
     compiler,
@@ -14,11 +14,12 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
-pub(crate) struct PatternPropertiesValidator<R> {
+#[derive(Debug)]
+pub(crate) struct PatternPropertiesValidator<R: Debug> {
     patterns: Vec<(Arc<R>, SchemaNode)>,
 }
 
-impl<R: RegexEngine> Validate for PatternPropertiesValidator<R> {
+impl<R: RegexEngine + Debug> Validate for PatternPropertiesValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Object(item) = instance {
             for (re, node) in &self.patterns {
@@ -112,12 +113,13 @@ impl<R: RegexEngine> Validate for PatternPropertiesValidator<R> {
     }
 }
 
-pub(crate) struct SingleValuePatternPropertiesValidator<R> {
+#[derive(Debug)]
+pub(crate) struct SingleValuePatternPropertiesValidator<R: Debug> {
     regex: Arc<R>,
     node: SchemaNode,
 }
 
-impl<R: RegexEngine> Validate for SingleValuePatternPropertiesValidator<R> {
+impl<R: RegexEngine + Debug> Validate for SingleValuePatternPropertiesValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Object(item) = instance {
             for (key, value) in item {
@@ -293,7 +295,7 @@ fn build_validator_from_entries<R>(
     single_factory: impl FnOnce(Arc<R>, SchemaNode) -> Box<dyn Validate>,
 ) -> Box<dyn Validate>
 where
-    R: RegexEngine + 'static,
+    R: RegexEngine + Debug + 'static,
 {
     if entries.len() == 1 {
         let (regex, node) = entries.pop().expect("len checked");

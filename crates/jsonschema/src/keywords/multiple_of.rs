@@ -9,6 +9,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct MultipleOfFloatValidator {
     multiple_of: f64,
     #[cfg(feature = "arbitrary-precision")]
@@ -74,6 +75,7 @@ impl Validate for MultipleOfFloatValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct MultipleOfIntegerValidator {
     multiple_of: f64,
     #[cfg(feature = "arbitrary-precision")]
@@ -140,6 +142,7 @@ impl Validate for MultipleOfIntegerValidator {
 }
 
 #[cfg(feature = "arbitrary-precision")]
+#[derive(Debug)]
 pub(crate) struct MultipleOfBigIntValidator {
     multiple_of: num_bigint::BigInt,
     original_value: serde_json::Number,
@@ -239,6 +242,7 @@ impl Validate for MultipleOfBigIntValidator {
 }
 
 #[cfg(feature = "arbitrary-precision")]
+#[derive(Debug)]
 pub(crate) struct MultipleOfBigFracValidator {
     multiple_of: fraction::BigFraction,
     original_value: serde_json::Number,

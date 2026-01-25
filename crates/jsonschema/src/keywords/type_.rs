@@ -12,6 +12,7 @@ use std::str::FromStr;
 
 use crate::paths::{LazyLocation, RefTracker};
 
+#[derive(Debug)]
 pub(crate) struct MultipleTypesValidator {
     types: JsonTypeSet,
     location: Location,
@@ -92,6 +93,7 @@ impl Validate for MultipleTypesValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct NullTypeValidator {
     location: Location,
 }
@@ -144,6 +146,7 @@ impl Validate for NullTypeValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct BooleanTypeValidator {
     location: Location,
 }
@@ -196,6 +199,7 @@ impl Validate for BooleanTypeValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct StringTypeValidator {
     location: Location,
 }
@@ -249,6 +253,7 @@ impl Validate for StringTypeValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct ArrayTypeValidator {
     location: Location,
 }
@@ -302,6 +307,7 @@ impl Validate for ArrayTypeValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct ObjectTypeValidator {
     location: Location,
 }
@@ -354,6 +360,7 @@ impl Validate for ObjectTypeValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct NumberTypeValidator {
     location: Location,
 }
@@ -406,6 +413,7 @@ impl Validate for NumberTypeValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct IntegerTypeValidator {
     location: Location,
 }

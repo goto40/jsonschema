@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::{
     paths::{LazyLocation, Location, RefTracker},
     validator::{Validate, ValidationContext},
@@ -5,6 +7,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct CustomKeyword {
     inner: Box<dyn Keyword>,
     location: Location,
@@ -66,7 +69,7 @@ impl Validate for CustomKeyword {
 ///     }
 /// }
 /// ```
-pub trait Keyword: Send + Sync {
+pub trait Keyword: Send + Sync + Debug {
     /// Validate an instance against this custom keyword.
     ///
     /// Use [`ValidationError::custom`] for error messages. Path information

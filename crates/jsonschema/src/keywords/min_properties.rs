@@ -9,6 +9,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct MinPropertiesValidator {
     limit: u64,
     location: Location,

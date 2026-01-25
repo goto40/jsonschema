@@ -9,6 +9,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct IfThenValidator {
     schema: SchemaNode,
     then_schema: SchemaNode,
@@ -96,6 +97,8 @@ impl Validate for IfThenValidator {
         }
     }
 }
+
+#[derive(Debug)]
 
 pub(crate) struct IfElseValidator {
     schema: SchemaNode,
@@ -185,6 +188,7 @@ impl Validate for IfElseValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct IfThenElseValidator {
     schema: SchemaNode,
     then_schema: SchemaNode,

@@ -12,6 +12,7 @@ use serde_json::{Map, Value};
 /// Tracks `$ref` traversals for `tracker` (JSON Schema 2020-12 Core, Section 12.4.2).
 ///
 /// Pushes the `$ref` location onto the tracker before delegating to the inner validator.
+#[derive(Debug)]
 struct RefValidator {
     inner: Box<dyn Validate>,
     /// Path of this `$ref` keyword relative to its resource base.

@@ -12,6 +12,7 @@ use crate::{
 use serde_json::{Map, Value};
 
 /// Validator for `contentMediaType` keyword.
+#[derive(Debug)]
 pub(crate) struct ContentMediaTypeValidator {
     media_type: String,
     func: ContentMediaTypeCheckType,
@@ -68,6 +69,7 @@ impl Validate for ContentMediaTypeValidator {
 }
 
 /// Validator for `contentEncoding` keyword.
+#[derive(Debug)]
 pub(crate) struct ContentEncodingValidator {
     encoding: String,
     func: ContentEncodingCheckType,
@@ -123,6 +125,7 @@ impl Validate for ContentEncodingValidator {
 }
 
 /// Combined validator for both `contentEncoding` and `contentMediaType` keywords.
+#[derive(Debug)]
 pub(crate) struct ContentMediaTypeAndEncodingValidator {
     media_type: String,
     encoding: String,

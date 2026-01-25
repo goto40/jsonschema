@@ -10,6 +10,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct PropertiesValidator {
     pub(crate) properties: Vec<(String, SchemaNode)>,
 }

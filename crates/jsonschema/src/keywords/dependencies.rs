@@ -9,6 +9,7 @@ use crate::{
 };
 use serde_json::{Map, Value};
 
+#[derive(Debug)]
 pub(crate) struct DependenciesValidator {
     dependencies: Vec<(String, SchemaNode)>,
 }
@@ -121,6 +122,7 @@ impl Validate for DependenciesValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct DependentRequiredValidator {
     dependencies: Vec<(String, SchemaNode)>,
 }
@@ -247,6 +249,7 @@ impl Validate for DependentRequiredValidator {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct DependentSchemasValidator {
     dependencies: Vec<(String, SchemaNode)>,
 }

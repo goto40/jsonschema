@@ -14,19 +14,19 @@ macro_rules! define_numeric_keywords {
     ($($struct_name:ident => $fn_name:path => $error_fn_name:ident),* $(,)?) => {
         $(
             #[derive(Debug, Clone, PartialEq)]
-            pub(crate) struct $struct_name<T> {
+            pub(crate) struct $struct_name<T: std::fmt::Debug> {
                 pub(super) limit: T,
                 limit_val: Value,
                 location: Location,
             }
 
-            impl<T> From<(T, Value, Location)> for $struct_name<T> {
+            impl<T: std::fmt::Debug> From<(T, Value, Location)> for $struct_name<T> {
                 fn from((limit, limit_val, location): (T, Value, Location)) -> Self {
                     Self { limit, limit_val, location }
                 }
             }
 
-            impl<T> Validate for $struct_name<T>
+            impl<T: std::fmt::Debug> Validate for $struct_name<T>
             where
                 T: Copy + Send + Sync + num_traits::ToPrimitive,
                 u64: NumCmp<T>,
