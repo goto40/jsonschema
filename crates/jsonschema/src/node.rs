@@ -1,5 +1,6 @@
 use crate::{
     compiler::Context,
+    deduced_type::{DeduceTypeError, DeduceTypeResult, DeducedType},
     error::ErrorIterator,
     evaluation::{Annotations, EvaluationNode},
     keywords::{BoxedValidator, Keyword},
@@ -73,6 +74,18 @@ struct KeywordValidators {
     // We should probably use AHashMap here but it breaks a bunch of tests which assume
     // validators are in a particular order
     validators: Vec<KeywordValidatorEntry>,
+}
+
+impl KeywordValidators {
+    fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+        self.validators
+            .iter()
+            .map(|k| k.validator.deduce_type())
+            .reduce(|acc, curr| acc?.combine(curr?))
+            .unwrap_or(Err(DeduceTypeError::unexpected(
+                "KeywordValidators::deduce_type w/o any inner validator",
+            )))
+    }
 }
 
 impl fmt::Debug for KeywordValidators {
@@ -590,6 +603,18 @@ impl Validate for SchemaNode {
                     annotations,
                     ctx,
                 )
+            }
+        }
+    }
+
+    fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+        match self.validators.as_ref() {
+            NodeValidators::Boolean { validator: _ } => {
+                Err(DeduceTypeError::not_implemented("NodeValidators::Boolean"))
+            }
+            NodeValidators::Keyword(keyword) => keyword.deduce_type(),
+            NodeValidators::Array { validators: _ } => {
+                Err(DeduceTypeError::not_implemented("NodeValidators::Array"))
             }
         }
     }
