@@ -2,6 +2,7 @@
 //! The main idea is to create a tree from the input JSON Schema. This tree will contain
 //! everything needed to perform such validation in runtime.
 use crate::{
+    deduced_type::{DeduceTypeError, DeduceTypeResult, DeducedType},
     error::{error, no_error, ErrorIterator},
     evaluation::{Annotations, ErrorDescription, Evaluation, EvaluationNode},
     node::SchemaNode,
@@ -145,6 +146,11 @@ pub(crate) trait Validate: Send + Sync {
     /// `/properties/foo/$ref`).
     fn canonical_location(&self) -> Option<&Location> {
         None
+    }
+
+    #[must_use]
+    fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+        return Err(DeduceTypeError::not_implemented("(trait default impl)"));
     }
 }
 
@@ -365,6 +371,16 @@ impl Validator {
     #[must_use]
     pub fn draft(&self) -> Draft {
         self.draft
+    }
+
+    #[must_use]
+    pub fn get_node(&self) -> &SchemaNode {
+        &self.root
+    }
+
+    #[must_use]
+    pub fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+        self.root.deduce_type()
     }
 }
 
