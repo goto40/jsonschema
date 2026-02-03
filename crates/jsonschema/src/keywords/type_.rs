@@ -1,14 +1,8 @@
 use crate::{
-    compiler,
-    error::ValidationError,
-    evaluation::ErrorDescription,
-    keywords::CompilationResult,
-    paths::Location,
-    types::{JsonType, JsonTypeSet},
-    validator::{EvaluationResult, Validate, ValidationContext},
+    compiler, deduced_type::{DeduceTypeResult, DeducedType, StructType}, error::ValidationError, evaluation::ErrorDescription, keywords::CompilationResult, paths::Location, types::{JsonType, JsonTypeSet}, validator::{EvaluationResult, Validate, ValidationContext}
 };
 use serde_json::{json, Map, Number, Value};
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 use crate::paths::{LazyLocation, RefTracker};
 
@@ -352,6 +346,13 @@ impl Validate for ObjectTypeValidator {
             )])
         }
     }
+
+    fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(StructType {
+            name: "TODO-Struct3".to_string(),
+            attributes: HashMap::new(),
+        })))
+    }    
 }
 
 pub(crate) struct NumberTypeValidator {

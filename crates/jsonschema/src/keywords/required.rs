@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::{self, DeduceTypeResult, DeducedType, StructType},
     error::{no_error, ErrorIterator, ValidationError},
     keywords::CompilationResult,
     paths::{LazyLocation, Location, RefTracker},
@@ -97,6 +98,26 @@ impl Validate for RequiredValidator {
             }
         }
         no_error()
+    }
+
+    fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(StructType {
+            name: "TODO-Struct2".to_string(),
+            attributes: self
+                .required
+                .iter()
+                .map(|name| {
+                    (
+                        name.clone(),
+                        deduced_type::StructAttribute {
+                            name: name.clone(),
+                            inner_type: DeducedType::Any,
+                            is_optional: false,
+                        },
+                    )
+                })
+                .collect(),
+        })))
     }
 }
 

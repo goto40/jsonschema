@@ -148,9 +148,11 @@ pub(crate) trait Validate: Send + Sync {
         None
     }
 
-    #[must_use]
     fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
-        return Err(DeduceTypeError::not_implemented("(trait default impl)"));
+        Err(DeduceTypeError::not_implemented(&format!(
+            "Trait default impl for {}",
+            std::any::type_name::<Self>()
+        )))
     }
 }
 

@@ -8,6 +8,7 @@
 //! Each valid combination of these keywords has a validator here.
 use crate::{
     compiler,
+    deduced_type::{DeduceTypeResult, DeducedType, StructType},
     error::{no_error, ErrorIterator, ValidationError},
     evaluation::{Annotations, ErrorDescription, EvaluationNode},
     keywords::CompilationResult,
@@ -25,7 +26,7 @@ use crate::{
 };
 use referencing::Uri;
 use serde_json::{Map, Value};
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 /// # Schema example
 ///
@@ -341,6 +342,13 @@ impl<M: PropertiesValidatorsMap> Validate for AdditionalPropertiesNotEmptyFalseV
         } else {
             EvaluationResult::valid_empty()
         }
+    }
+
+    fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(StructType {
+            name: "TODO-Struct1".to_string(),
+            attributes: HashMap::new(),
+        })))
     }
 }
 
