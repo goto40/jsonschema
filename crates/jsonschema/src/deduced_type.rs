@@ -60,9 +60,9 @@ impl DeducedType {
     pub fn combine(&self, other: &DeducedType) -> DeduceTypeResult<DeducedType> {
         match (self, other) {
             (DeducedType::Struct(s1), DeducedType::Struct(s2)) => Self::combine_structs(s1, s2),
-            _ => Err(DeduceTypeError::not_implemented(
-                "DeduceType::combine: case not implemented",
-            )),
+            _ => Err(DeduceTypeError::not_implemented(&format!(
+                "DeduceType::combine: case not implemented for ({self:?},{other:?})"
+            ))),
         }
     }
 }
