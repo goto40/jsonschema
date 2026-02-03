@@ -81,7 +81,7 @@ impl KeywordValidators {
         self.validators
             .iter()
             .map(|k| k.validator.deduce_type())
-            .reduce(|acc, curr| acc?.combine(curr?))
+            .reduce(|acc, curr| acc?.combine(&curr?))
             .unwrap_or(Err(DeduceTypeError::unexpected(
                 "KeywordValidators::deduce_type w/o any inner validator",
             )))
