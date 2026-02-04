@@ -23,5 +23,5 @@ fn main() {
     //println!("evaluation {evaluation:?}");
 
     println!("Deduced type:");
-    println!("{:#?}", validator.deduce_type());
+    println!("{:#?}", validator.deduce_type("root"));
 }

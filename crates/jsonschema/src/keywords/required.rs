@@ -100,9 +100,9 @@ impl Validate for RequiredValidator {
         no_error()
     }
 
-    fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, name: &str) -> DeduceTypeResult<DeducedType> {
         Ok(DeducedType::Struct(Box::new(StructType {
-            name: "TODO-Struct2".to_string(),
+            name: name.to_string(),
             attributes: self
                 .required
                 .iter()
@@ -110,7 +110,6 @@ impl Validate for RequiredValidator {
                     (
                         name.clone(),
                         deduced_type::StructAttribute {
-                            name: name.clone(),
                             inner_type: DeducedType::Any,
                             is_optional: false,
                         },

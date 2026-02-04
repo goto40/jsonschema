@@ -344,9 +344,9 @@ impl<M: PropertiesValidatorsMap> Validate for AdditionalPropertiesNotEmptyFalseV
         }
     }
 
-    fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, name: &str) -> DeduceTypeResult<DeducedType> {
         Ok(DeducedType::Struct(Box::new(StructType {
-            name: "TODO-Struct1".to_string(),
+            name: name.to_string(),
             attributes: HashMap::new(),
         })))
     }

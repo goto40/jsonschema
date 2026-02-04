@@ -37,11 +37,16 @@ pub enum DeducedType {
 impl DeducedType {
     fn combine_structs(s1: &StructType, s2: &StructType) -> DeduceTypeResult<DeducedType> {
         let name = s1.name.clone();
+        if s2.name != name {
+            return Err(DeduceTypeError::unexpected(&format!(
+                "combining structs with different name {}!={name}",
+                s2.name
+            )));
+        }
         let mut attributes = s1.attributes.clone();
         for (name, attr) in &s2.attributes {
             if let Some(exisiting_attr) = attributes.get(name) {
                 let new_attr = StructAttribute {
-                    name: name.clone(),
                     inner_type: exisiting_attr.inner_type.combine(&attr.inner_type)?,
                     is_optional: exisiting_attr.is_optional && attr.is_optional,
                 };
@@ -57,6 +62,9 @@ impl DeducedType {
         })))
     }
 
+    /// # Errors
+    ///
+    /// Will return `Err` if the type cannot be deduced.
     pub fn combine(&self, other: &DeducedType) -> DeduceTypeResult<DeducedType> {
         match (self, other) {
             (DeducedType::Struct(s1), DeducedType::Struct(s2)) => Self::combine_structs(s1, s2),
@@ -87,7 +95,6 @@ pub struct StructType {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StructAttribute {
-    pub name: String,
     pub inner_type: DeducedType,
     pub is_optional: bool,
 }
