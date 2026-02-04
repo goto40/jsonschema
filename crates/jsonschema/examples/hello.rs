@@ -19,7 +19,7 @@ fn main() {
     let validator = jsonschema::validator_for(&schema).unwrap();
     //println!("Hello {validator:?}");
     let instance = json!({"color": "red", "size_cm": 5.2});
-    let evaluation = validator.evaluate(&instance);
+    let _evaluation = validator.evaluate(&instance);
     //println!("evaluation {evaluation:?}");
 
     println!("Deduced type:");

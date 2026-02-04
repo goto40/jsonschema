@@ -88,15 +88,6 @@ impl KeywordValidators {
     }
 }
 
-impl fmt::Debug for KeywordValidators {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("KeywordValidators")
-            .field("unmatched_keywords", &self.unmatched_keywords)
-            .field("validators", &self.validators)
-            .finish()
-    }
-}
-
 struct KeywordValidatorEntry {
     validator: BoxedValidator,
     location: Location,

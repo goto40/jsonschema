@@ -375,12 +375,6 @@ impl Validator {
         self.draft
     }
 
-    #[must_use]
-    pub fn get_node(&self) -> &SchemaNode {
-        &self.root
-    }
-
-    #[must_use]
     pub fn deduce_type(&self) -> DeduceTypeResult<DeducedType> {
         self.root.deduce_type()
     }
