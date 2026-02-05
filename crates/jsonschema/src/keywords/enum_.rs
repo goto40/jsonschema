@@ -134,6 +134,18 @@ impl Validate for SingleValueEnumValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         cmp::equal(&self.value, instance)
     }
+
+    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+        let enum_entries = vec![self
+            .value
+            .as_str()
+            .ok_or(DeduceTypeError::unexpected("enum name invalid"))?
+            .to_owned()];
+        Ok(DeducedType::Enum(Box::new(EnumType {
+            name: type_name.to_string(),
+            enum_entries,
+        })))
+    }
 }
 
 #[inline]
