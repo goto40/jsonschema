@@ -101,6 +101,7 @@ impl Validate for RequiredValidator {
     }
 
     fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+        // add required fields (type: Any -> to be refined by other validators)
         Ok(DeducedType::Struct(Box::new(StructType {
             name: type_name.to_string(),
             attributes: self
