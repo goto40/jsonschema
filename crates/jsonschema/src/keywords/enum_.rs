@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::{DeduceTypeError, DeduceTypeResult, DeducedType, EnumType},
     error::ValidationError,
     ext::cmp,
     keywords::CompilationResult,
@@ -68,6 +69,22 @@ impl Validate for EnumValidator {
         } else {
             false
         }
+    }
+
+    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+        let enum_entries = self
+            .items
+            .iter()
+            .map(|e| {
+                e.as_str()
+                    .ok_or(DeduceTypeError::unexpected("enum name invalid"))
+                    .map(ToOwned::to_owned)
+            })
+            .collect::<DeduceTypeResult<Vec<_>>>()?;
+        Ok(DeducedType::Enum(Box::new(EnumType {
+            name: type_name.to_string(),
+            enum_entries,
+        })))
     }
 }
 

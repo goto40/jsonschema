@@ -28,6 +28,7 @@ pub enum DeducedType {
     String,
     Number,
     Boolean,
+    Enum(Box<EnumType>),
     Array(Box<ArrayType>),
     Struct(Box<StructType>),
     Variant(Box<VariantType>),
@@ -51,7 +52,6 @@ impl DeducedType {
                     is_optional: exisiting_attr.is_optional && attr.is_optional,
                 };
                 attributes.insert(name.clone(), new_attr);
-                panic!("TODO")
             } else {
                 attributes.insert(name.clone(), attr.clone());
             }
@@ -91,6 +91,12 @@ pub struct VariantType {
 pub struct StructType {
     pub name: String,
     pub attributes: HashMap<String, StructAttribute>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct EnumType {
+    pub name: String,
+    pub enum_entries: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]

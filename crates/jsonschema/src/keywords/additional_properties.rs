@@ -8,7 +8,7 @@
 //! Each valid combination of these keywords has a validator here.
 use crate::{
     compiler,
-    deduced_type::{DeduceTypeResult, DeducedType, StructType},
+    deduced_type::{DeduceTypeError, DeduceTypeResult, DeducedType, StructAttribute, StructType},
     error::{no_error, ErrorIterator, ValidationError},
     evaluation::{Annotations, ErrorDescription, EvaluationNode},
     keywords::CompilationResult,
@@ -345,9 +345,27 @@ impl<M: PropertiesValidatorsMap> Validate for AdditionalPropertiesNotEmptyFalseV
     }
 
     fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+        let attributes = self
+            .properties
+            .get_keys()
+            .into_iter()
+            .map(|name| -> DeduceTypeResult<(String, StructAttribute)> {
+                let attr = StructAttribute {
+                    inner_type: self
+                        .properties
+                        .get_validator(&name)
+                        .ok_or(DeduceTypeError::unexpected(
+                            "name not found in map (impossible)",
+                        ))?
+                        .deduce_type(&format!("{type_name}_{name}"))?,
+                    is_optional: true,
+                };
+                Ok((name, attr))
+            })
+            .collect::<DeduceTypeResult<HashMap<_, _>>>()?;
         Ok(DeducedType::Struct(Box::new(StructType {
             name: type_name.to_string(),
-            attributes: HashMap::new(),
+            attributes,
         })))
     }
 }

@@ -17,6 +17,7 @@ pub(crate) type RegexValidators = Vec<(regex::Regex, SchemaNode)>;
 pub(crate) trait PropertiesValidatorsMap: Send + Sync {
     fn get_validator(&self, property: &str) -> Option<&SchemaNode>;
     fn get_key_validator(&self, property: &str) -> Option<(&String, &SchemaNode)>;
+    fn get_keys(&self) -> Vec<String>;
 }
 
 // We're defining two different property validator map implementations, one for small map sizes and
@@ -48,6 +49,10 @@ impl PropertiesValidatorsMap for SmallValidatorsMap {
         }
         None
     }
+    #[inline]
+    fn get_keys(&self) -> Vec<String> {
+        self.iter().map(|(name, _)| name.clone()).collect()
+    }
 }
 
 impl PropertiesValidatorsMap for BigValidatorsMap {
@@ -59,6 +64,10 @@ impl PropertiesValidatorsMap for BigValidatorsMap {
     #[inline]
     fn get_key_validator(&self, property: &str) -> Option<(&String, &SchemaNode)> {
         self.get_key_value(property)
+    }
+    #[inline]
+    fn get_keys(&self) -> Vec<String> {
+        self.keys().cloned().collect()
     }
 }
 

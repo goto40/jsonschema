@@ -413,6 +413,9 @@ impl Validate for NumberTypeValidator {
             )])
         }
     }
+    fn deduce_type(&self, _type_name: &str) -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Number)
+    }
 }
 
 pub(crate) struct IntegerTypeValidator {
