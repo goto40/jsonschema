@@ -148,9 +148,9 @@ pub(crate) trait Validate: Send + Sync {
         None
     }
 
-    fn deduce_type(&self, name: &str) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
         Err(DeduceTypeError::not_implemented(&format!(
-            "Trait default impl for {name}: {}",
+            "Trait default impl for {type_name}: {}",
             std::any::type_name::<Self>()
         )))
     }
@@ -375,8 +375,11 @@ impl Validator {
         self.draft
     }
 
-    pub fn deduce_type(&self, name: &str) -> DeduceTypeResult<DeducedType> {
-        self.root.deduce_type(name)
+    /// # Errors
+    ///
+    /// Will return `Err` if the type cannot be deduced.
+    pub fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+        self.root.deduce_type(type_name)
     }
 }
 

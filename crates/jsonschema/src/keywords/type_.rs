@@ -354,9 +354,9 @@ impl Validate for ObjectTypeValidator {
         }
     }
 
-    fn deduce_type(&self, name: &str) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
         Ok(DeducedType::Struct(Box::new(StructType {
-            name: name.to_string(),
+            name: type_name.to_string(),
             attributes: HashMap::new(),
         })))
     }
