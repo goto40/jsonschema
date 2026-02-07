@@ -371,7 +371,7 @@ impl Validator {
     /// # Errors
     ///
     /// Will return `Err` if the type cannot be deduced.
-    pub fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+    pub fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
         self.root.deduce_type(type_name)
     }
 }

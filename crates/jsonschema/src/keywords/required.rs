@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     compiler,
     deduced_type::{self, DeduceType, DeduceTypeResult, DeducedType, StructType},
@@ -116,7 +118,22 @@ impl SingleItemRequiredValidator {
     }
 }
 
-impl DeduceType for SingleItemRequiredValidator {}
+impl DeduceType for SingleItemRequiredValidator {
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        // add required fields (type: Any -> to be refined by other validators)
+        Ok(DeducedType::Struct(Box::new(StructType {
+            name: type_name.to_owned(),
+            attributes: HashMap::from([(
+                self.value.as_str().to_owned(),
+                deduced_type::StructAttribute {
+                    inner_type: DeducedType::Any,
+                    is_optional: false,
+                },
+            )]),
+            additional_attributes: None,
+        })))
+    }
+}
 
 impl Validate for SingleItemRequiredValidator {
     fn validate<'i>(
@@ -196,10 +213,10 @@ pub(crate) fn compile_with_path(
 }
 
 impl DeduceType for RequiredValidator {
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
         // add required fields (type: Any -> to be refined by other validators)
         Ok(DeducedType::Struct(Box::new(StructType {
-            name: type_name.to_string(),
+            name: type_name.to_owned(),
             attributes: self
                 .required
                 .iter()
@@ -213,13 +230,19 @@ impl DeduceType for RequiredValidator {
                     )
                 })
                 .collect(),
+            additional_attributes: None,
         })))
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::tests_util;
+    use std::collections::HashMap;
+
+    use crate::{
+        deduced_type::{deduce_type, DeducedType, StructAttribute, StructType},
+        tests_util,
+    };
     use serde_json::{json, Value};
     use test_case::test_case;
 
@@ -227,5 +250,81 @@ mod tests {
     #[test_case(&json!({"required": ["a", "b"]}), &json!({}), "/required")]
     fn location(schema: &Value, instance: &Value, expected: &str) {
         tests_util::assert_schema_location(schema, instance, expected);
+    }
+
+    #[test]
+    fn deduce_type_test1() {
+        assert_eq!(
+            deduce_type(
+                &json!({
+                    "type": "object",
+                    "properties": {
+                        "color": {"type": "integer"},
+                        "size_cm": {"type": "number"}
+                    },
+                    "additionalProperties": false,
+                    "required": ["color", "size_cm"]
+                }),
+                "myname"
+            ),
+            Ok(DeducedType::Struct(Box::new(StructType {
+                name: vec!["myname".to_owned()],
+                attributes: HashMap::from([
+                    (
+                        "color".to_owned(),
+                        StructAttribute {
+                            inner_type: DeducedType::Integer,
+                            is_optional: false,
+                        }
+                    ),
+                    (
+                        "size_cm".to_owned(),
+                        StructAttribute {
+                            inner_type: DeducedType::Number,
+                            is_optional: false,
+                        }
+                    )
+                ]),
+                additional_attributes: None
+            })))
+        );
+    }
+
+    #[test]
+    fn deduce_type_test2() {
+        assert_eq!(
+            deduce_type(
+                &json!({
+                    "type": "object",
+                    "properties": {
+                        "color": {"type": "integer"},
+                        "size_cm": {"type": "number"}
+                    },
+                    "additionalProperties": false,
+                    "required": ["color"]
+                }),
+                "myname"
+            ),
+            Ok(DeducedType::Struct(Box::new(StructType {
+                name: vec!["myname".to_owned()],
+                attributes: HashMap::from([
+                    (
+                        "color".to_owned(),
+                        StructAttribute {
+                            inner_type: DeducedType::Integer,
+                            is_optional: false,
+                        }
+                    ),
+                    (
+                        "size_cm".to_owned(),
+                        StructAttribute {
+                            inner_type: DeducedType::Number,
+                            is_optional: true,
+                        }
+                    )
+                ]),
+                additional_attributes: None
+            })))
+        );
     }
 }

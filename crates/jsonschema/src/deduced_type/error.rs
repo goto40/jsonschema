@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum DeduceTypeError {
     NotImplemented(String),
     Unexpected(String),

@@ -77,11 +77,11 @@ struct KeywordValidators {
 }
 
 impl DeduceType for KeywordValidators {
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
         self.validators
             .iter()
             .map(|k| k.validator.deduce_type(type_name))
-            .reduce(|acc, curr| combine(&acc?, &curr?))
+            .reduce(|acc, curr| combine(&acc?, &curr?, type_name))
             .unwrap_or(Err(DeduceTypeError::unexpected(
                 "KeywordValidators::deduce_type w/o any inner validator",
             )))
@@ -592,7 +592,7 @@ impl Validate for SchemaNode {
 }
 
 impl DeduceType for SchemaNode {
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
         match self.validators.as_ref() {
             NodeValidators::Boolean { validator: _ } => {
                 Err(DeduceTypeError::not_implemented("NodeValidators::Boolean"))

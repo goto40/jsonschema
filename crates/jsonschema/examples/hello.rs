@@ -1,4 +1,5 @@
 #![allow(clippy::print_stdout)]
+use jsonschema::deduced_type::deduce_type;
 use serde_json::{self, json};
 
 fn main() {
@@ -23,5 +24,5 @@ fn main() {
     //println!("evaluation {evaluation:?}");
 
     println!("Deduced type:");
-    println!("{:#?}", validator.deduce_type("root"));
+    println!("{:#?}", deduce_type(&schema, "root"));
 }

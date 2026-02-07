@@ -214,7 +214,11 @@ impl StringTypeValidator {
     }
 }
 
-impl DeduceType for StringTypeValidator {}
+impl DeduceType for StringTypeValidator {
+    fn deduce_type(&self, _type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::String)
+    }
+}
 
 impl Validate for StringTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
@@ -366,11 +370,12 @@ impl Validate for ObjectTypeValidator {
 }
 
 impl DeduceType for ObjectTypeValidator {
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
         // just define a struct (fields to be defined via other validators)
         Ok(DeducedType::Struct(Box::new(StructType {
-            name: type_name.to_string(),
+            name: type_name.to_owned(),
             attributes: HashMap::new(),
+            additional_attributes: None,
         })))
     }
 }
@@ -428,7 +433,7 @@ impl Validate for NumberTypeValidator {
 }
 
 impl DeduceType for NumberTypeValidator {
-    fn deduce_type(&self, _type_name: &str) -> DeduceTypeResult<DeducedType> {
+    fn deduce_type(&self, _type_name: &[String]) -> DeduceTypeResult<DeducedType> {
         Ok(DeducedType::Number)
     }
 }
@@ -444,7 +449,11 @@ impl IntegerTypeValidator {
     }
 }
 
-impl DeduceType for IntegerTypeValidator {}
+impl DeduceType for IntegerTypeValidator {
+    fn deduce_type(&self, _type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Integer)
+    }
+}
 
 impl Validate for IntegerTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {

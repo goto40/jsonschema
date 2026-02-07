@@ -1,6 +1,6 @@
 use crate::{
     compiler,
-    deduced_type::DeduceType,
+    deduced_type::{DeduceType, DeducedType},
     error::ValidationError,
     ext::numeric,
     keywords::CompilationResult,
@@ -99,7 +99,14 @@ impl MultipleOfIntegerValidator {
     }
 }
 
-impl DeduceType for MultipleOfIntegerValidator {}
+impl DeduceType for MultipleOfIntegerValidator {
+    fn deduce_type(
+        &self,
+        _type_name: &[String],
+    ) -> crate::deduced_type::DeduceTypeResult<crate::deduced_type::DeducedType> {
+        Ok(DeducedType::Any)
+    }
+}
 
 impl Validate for MultipleOfIntegerValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {

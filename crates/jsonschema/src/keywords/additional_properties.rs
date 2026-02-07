@@ -9,7 +9,8 @@
 use crate::{
     compiler,
     deduced_type::{
-        DeduceType, DeduceTypeError, DeduceTypeResult, DeducedType, StructAttribute, StructType,
+        add_names, deduce_struct_type_from_properties, deduce_type_from_patterns, DeduceType,
+        DeduceTypeResult, DeducedType, StructType,
     },
     error::{no_error, ErrorIterator, ValidationError},
     evaluation::{Annotations, ErrorDescription, EvaluationNode},
@@ -704,7 +705,18 @@ pub(crate) struct AdditionalPropertiesWithPatternsFalseValidator<R> {
     pattern_keyword_absolute_location: Option<Arc<Uri<String>>>,
 }
 
-impl<R: RegexEngine> DeduceType for AdditionalPropertiesWithPatternsFalseValidator<R> {}
+impl<R: RegexEngine> DeduceType for AdditionalPropertiesWithPatternsFalseValidator<R> {
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(StructType {
+            name: type_name.to_owned(),
+            attributes: HashMap::from([]),
+            additional_attributes: Some(deduce_type_from_patterns(
+                &self.patterns,
+                &add_names(type_name, "@additional_attributes"),
+            )?),
+        })))
+    }
+}
 
 impl<R: RegexEngine> Validate for AdditionalPropertiesWithPatternsFalseValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -1108,6 +1120,16 @@ pub(crate) struct AdditionalPropertiesWithPatternsNotEmptyFalseValidator<
 impl<M: PropertiesValidatorsMap, R: RegexEngine> DeduceType
     for AdditionalPropertiesWithPatternsNotEmptyFalseValidator<M, R>
 {
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        deduce_struct_type_from_properties(
+            &self.properties,
+            type_name,
+            Some(deduce_type_from_patterns(
+                &self.patterns,
+                &add_names(type_name, "@additional_attributes"),
+            )?),
+        )
+    }
 }
 
 impl<M: PropertiesValidatorsMap, R: RegexEngine> Validate
@@ -1564,35 +1586,19 @@ pub(crate) fn compile<'a>(
 }
 
 impl<M: PropertiesValidatorsMap> DeduceType for AdditionalPropertiesNotEmptyFalseValidator<M> {
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
-        let attributes = self
-            .properties
-            .get_keys()
-            .into_iter()
-            .map(|name| -> DeduceTypeResult<(String, StructAttribute)> {
-                let attr = StructAttribute {
-                    inner_type: self
-                        .properties
-                        .get_validator(&name)
-                        .ok_or(DeduceTypeError::unexpected(
-                            "name not found in map (impossible)",
-                        ))?
-                        .deduce_type(&format!("{type_name}_{name}"))?,
-                    is_optional: true,
-                };
-                Ok((name, attr))
-            })
-            .collect::<DeduceTypeResult<HashMap<_, _>>>()?;
-        Ok(DeducedType::Struct(Box::new(StructType {
-            name: type_name.to_string(),
-            attributes,
-        })))
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        deduce_struct_type_from_properties(&self.properties, type_name, None)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::tests_util;
+    use std::collections::HashMap;
+
+    use crate::{
+        deduced_type::{deduce_type, DeduceTypeResult, DeducedType, StructAttribute, VariantType},
+        tests_util,
+    };
     use serde_json::{json, Value};
     use test_case::test_case;
 
@@ -1609,6 +1615,31 @@ mod tests {
                 "spam$": {"type": "integer", "maximum": 10},
             }
         })
+    }
+
+    fn schema_1_deduced_type() -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(
+            crate::deduced_type::StructType {
+                name: vec!["A".to_owned()],
+                attributes: HashMap::from([
+                    (
+                        "foo".to_owned(),
+                        StructAttribute {
+                            inner_type: DeducedType::String,
+                            is_optional: true,
+                        },
+                    ),
+                    (
+                        "barbaz".to_owned(),
+                        StructAttribute {
+                            inner_type: DeducedType::Integer,
+                            is_optional: true,
+                        },
+                    ),
+                ]),
+                additional_attributes: Some(DeducedType::Integer),
+            },
+        )))
     }
 
     // Another type
@@ -1680,6 +1711,11 @@ mod tests {
         tests_util::assert_locations(&schema, instance, locations);
     }
 
+    #[test]
+    fn deduce_type_from_schema_1() {
+        assert_eq!(deduce_type(&schema_1(), "A"), schema_1_deduced_type());
+    }
+
     fn schema_2() -> Value {
         // For `AdditionalPropertiesWithPatternsFalseValidator`
         json!({
@@ -1689,6 +1725,71 @@ mod tests {
                 "spam$": {"type": "integer", "maximum": 10},
             }
         })
+    }
+
+    fn schema_2_deduced_type() -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(
+            crate::deduced_type::StructType {
+                name: vec!["A".to_owned()],
+                attributes: HashMap::from([]),
+                additional_attributes: Some(DeducedType::Integer),
+            },
+        )))
+    }
+
+    fn schema_2b() -> Value {
+        // For `AdditionalPropertiesWithPatternsFalseValidator`
+        json!({
+            "additionalProperties": false,
+            "patternProperties": {
+                "^bar": {"type": "integer", "minimum": 5},
+                "spam$": {"type": "string"},
+            }
+        })
+    }
+
+    fn schema_2b_deduced_type() -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(
+            crate::deduced_type::StructType {
+                name: vec!["A".to_owned()],
+                attributes: HashMap::from([]),
+                additional_attributes: Some(DeducedType::Variant(Box::new(VariantType {
+                    name: vec!["A".to_owned(), "@additional_attributes".to_owned()],
+                    possible_types: vec![DeducedType::Integer, DeducedType::String],
+                }))),
+            },
+        )))
+    }
+
+    fn schema_2c() -> Value {
+        // For `AdditionalPropertiesWithPatternsFalseValidator`
+        json!({
+            "additionalProperties": false,
+            "patternProperties": {
+                "^bar": {"type": "integer", "minimum": 5},
+                "^test": {"type": "integer", "minimum": 3},
+                "spam$": {"type": "string"},
+                "baz$": {"type": "number"},
+                "foo$": {"type": "string"},
+            }
+        })
+    }
+
+    fn schema_2c_deduced_type() -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(
+            crate::deduced_type::StructType {
+                name: vec!["A".to_owned()],
+                attributes: HashMap::from([]),
+                additional_attributes: Some(DeducedType::Variant(Box::new(VariantType {
+                    name: vec!["A".to_owned(), "@additional_attributes".to_owned()],
+                    possible_types: vec![
+                        DeducedType::String,
+                        DeducedType::Number,
+                        DeducedType::Integer,
+                    ],
+                }))),
+            },
+        )))
     }
 
     // Another type
@@ -1747,6 +1848,19 @@ mod tests {
         tests_util::assert_locations(&schema, instance, locations);
     }
 
+    #[test]
+    fn deduce_type_from_schema_2() {
+        assert_eq!(deduce_type(&schema_2(), "A"), schema_2_deduced_type());
+    }
+    #[test]
+    fn deduce_type_from_schema_2b() {
+        assert_eq!(deduce_type(&schema_2b(), "A"), schema_2b_deduced_type());
+    }
+    #[test]
+    fn deduce_type_from_schema_2c() {
+        assert_eq!(deduce_type(&schema_2c(), "A"), schema_2c_deduced_type());
+    }
+
     fn schema_3() -> Value {
         // For `AdditionalPropertiesNotEmptyFalseValidator`
         json!({
@@ -1755,6 +1869,22 @@ mod tests {
                 "foo": {"type": "string"}
             }
         })
+    }
+
+    fn schema_3_deduced_type() -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Struct(Box::new(
+            crate::deduced_type::StructType {
+                name: vec!["A".to_owned()],
+                attributes: HashMap::from([(
+                    "foo".to_owned(),
+                    StructAttribute {
+                        inner_type: DeducedType::String,
+                        is_optional: true,
+                    },
+                )]),
+                additional_attributes: None,
+            },
+        )))
     }
 
     // Another type
@@ -1766,6 +1896,11 @@ mod tests {
     fn schema_3_valid(instance: &Value) {
         let schema = schema_3();
         tests_util::is_valid(&schema, instance);
+    }
+
+    #[test]
+    fn deduce_type_from_schema_3() {
+        assert_eq!(deduce_type(&schema_3(), "A"), schema_3_deduced_type());
     }
 
     // `properties` - should be a string

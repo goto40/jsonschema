@@ -1,6 +1,6 @@
 use crate::{
     compiler,
-    deduced_type::{DeduceType, DeduceTypeError, DeduceTypeResult, DeducedType, EnumType},
+    deduced_type::{DeduceType, DeduceTypeResult, DeducedType, EnumType},
     error::ValidationError,
     ext::cmp,
     keywords::CompilationResult,
@@ -147,32 +147,20 @@ pub(crate) fn compile<'a>(
 }
 
 impl DeduceType for EnumValidator {
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
-        let enum_entries = self
-            .items
-            .iter()
-            .map(|e| {
-                e.as_str()
-                    .ok_or(DeduceTypeError::unexpected("enum name invalid"))
-                    .map(ToOwned::to_owned)
-            })
-            .collect::<DeduceTypeResult<Vec<_>>>()?;
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        let enum_entries = self.items.iter().map(Clone::clone).collect::<Vec<_>>();
         Ok(DeducedType::Enum(Box::new(EnumType {
-            name: type_name.to_string(),
+            name: type_name.to_owned(),
             enum_entries,
         })))
     }
 }
 
 impl DeduceType for SingleValueEnumValidator {
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
-        let enum_entries = vec![self
-            .value
-            .as_str()
-            .ok_or(DeduceTypeError::unexpected("enum name invalid"))?
-            .to_owned()];
+    fn deduce_type(&self, type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        let enum_entries = vec![self.value.clone()];
         Ok(DeducedType::Enum(Box::new(EnumType {
-            name: type_name.to_string(),
+            name: type_name.to_owned(),
             enum_entries,
         })))
     }
@@ -180,7 +168,10 @@ impl DeduceType for SingleValueEnumValidator {
 
 #[cfg(test)]
 mod tests {
-    use crate::tests_util;
+    use crate::{
+        deduced_type::{deduce_type, DeducedType, EnumType},
+        tests_util,
+    };
     use serde_json::{json, Value};
     use test_case::test_case;
 
@@ -188,5 +179,26 @@ mod tests {
     #[test_case(&json!({"enum": [1, 3]}), &json!(2), "/enum")]
     fn location(schema: &Value, instance: &Value, expected: &str) {
         tests_util::assert_schema_location(schema, instance, expected);
+    }
+
+    #[test]
+    fn deduce_type_test1() {
+        assert_eq!(
+            deduce_type(&json!({"enum": [1]}), "foo"),
+            Ok(DeducedType::Enum(Box::new(EnumType {
+                name: vec!["foo".to_owned()],
+                enum_entries: vec![json!(1)]
+            })))
+        );
+    }
+    #[test]
+    fn deduce_type_test2() {
+        assert_eq!(
+            deduce_type(&json!({"enum": [1,2,"x"]}), "foo"),
+            Ok(DeducedType::Enum(Box::new(EnumType {
+                name: vec!["foo".to_owned()],
+                enum_entries: vec![json!(1), json!(2), json!("x")]
+            })))
+        );
     }
 }
