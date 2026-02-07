@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{no_error, ErrorIterator, ValidationError},
     keywords::CompilationResult,
     node::SchemaNode,
@@ -21,6 +22,8 @@ impl PropertyNamesObjectValidator {
         }))
     }
 }
+
+impl DeduceType for PropertyNamesObjectValidator {}
 
 impl Validate for PropertyNamesObjectValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -124,6 +127,8 @@ impl PropertyNamesBooleanValidator {
         Ok(Box::new(PropertyNamesBooleanValidator { location }))
     }
 }
+
+impl DeduceType for PropertyNamesBooleanValidator {}
 
 impl Validate for PropertyNamesBooleanValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {

@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     evaluation::ErrorDescription,
     keywords::CompilationResult,
@@ -82,6 +83,8 @@ impl SingleOneOfValidator {
     }
 }
 
+impl DeduceType for SingleOneOfValidator {}
+
 impl Validate for SingleOneOfValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         self.node.is_valid(instance, ctx)
@@ -123,6 +126,8 @@ impl Validate for SingleOneOfValidator {
         )
     }
 }
+
+impl DeduceType for OneOfValidator {}
 
 impl Validate for OneOfValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

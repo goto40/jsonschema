@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{no_error, ErrorIterator},
     keywords::CompilationResult,
     node::SchemaNode,
@@ -34,6 +35,7 @@ impl IfThenValidator {
     }
 }
 
+impl DeduceType for IfThenValidator {}
 impl Validate for IfThenValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if self.schema.is_valid(instance, ctx) {
@@ -122,6 +124,7 @@ impl IfElseValidator {
     }
 }
 
+impl DeduceType for IfElseValidator {}
 impl Validate for IfElseValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if self.schema.is_valid(instance, ctx) {
@@ -216,6 +219,7 @@ impl IfThenElseValidator {
     }
 }
 
+impl DeduceType for IfThenElseValidator {}
 impl Validate for IfThenElseValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if self.schema.is_valid(instance, ctx) {

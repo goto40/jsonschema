@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     keywords::{type_, CompilationResult},
     paths::{LazyLocation, Location, RefTracker},
@@ -50,6 +51,7 @@ impl MultipleTypesValidator {
     }
 }
 
+impl DeduceType for MultipleTypesValidator {}
 impl Validate for MultipleTypesValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         self.types.contains_value_type(instance)
@@ -86,6 +88,7 @@ impl IntegerTypeValidator {
     }
 }
 
+impl DeduceType for IntegerTypeValidator {}
 impl Validate for IntegerTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         if let Value::Number(num) = instance {

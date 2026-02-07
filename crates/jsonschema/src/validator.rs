@@ -2,7 +2,7 @@
 //! The main idea is to create a tree from the input JSON Schema. This tree will contain
 //! everything needed to perform such validation in runtime.
 use crate::{
-    deduced_type::{DeduceTypeError, DeduceTypeResult, DeducedType},
+    deduced_type::{DeduceType, DeduceTypeResult, DeducedType},
     error::{error, no_error, ErrorIterator},
     evaluation::{Annotations, ErrorDescription, Evaluation, EvaluationNode},
     node::SchemaNode,
@@ -93,7 +93,7 @@ impl ValidationContext {
 ///
 /// - `is_valid` takes `LightweightContext`: Only cycle detection, zero path tracking overhead.
 /// - `validate`, `iter_errors`, `evaluate` take `ValidationContext`: Cycle detection + evaluation path tracking.
-pub(crate) trait Validate: Send + Sync {
+pub(crate) trait Validate: Send + Sync + DeduceType {
     fn iter_errors<'i>(
         &self,
         instance: &'i Value,
@@ -146,13 +146,6 @@ pub(crate) trait Validate: Send + Sync {
     /// `/properties/foo/$ref`).
     fn canonical_location(&self) -> Option<&Location> {
         None
-    }
-
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
-        Err(DeduceTypeError::not_implemented(&format!(
-            "Trait default impl for {type_name}: {}",
-            std::any::type_name::<Self>()
-        )))
     }
 }
 

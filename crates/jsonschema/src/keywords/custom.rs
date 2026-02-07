@@ -1,4 +1,5 @@
 use crate::{
+    deduced_type::DeduceType,
     paths::{LazyLocation, Location, RefTracker},
     validator::{Validate, ValidationContext},
     ValidationError,
@@ -20,6 +21,8 @@ impl CustomKeyword {
         }
     }
 }
+
+impl DeduceType for CustomKeyword {}
 
 impl Validate for CustomKeyword {
     fn validate<'i>(

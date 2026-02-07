@@ -1,6 +1,6 @@
 use crate::{
     compiler,
-    deduced_type::{DeduceTypeResult, DeducedType, StructType},
+    deduced_type::{DeduceType, DeduceTypeResult, DeducedType, StructType},
     error::ValidationError,
     evaluation::ErrorDescription,
     keywords::CompilationResult,
@@ -54,6 +54,8 @@ impl MultipleTypesValidator {
     }
 }
 
+impl DeduceType for MultipleTypesValidator {}
+
 impl Validate for MultipleTypesValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         self.types.contains_value_type(instance)
@@ -103,6 +105,8 @@ impl NullTypeValidator {
         Ok(Box::new(NullTypeValidator { location }))
     }
 }
+
+impl DeduceType for NullTypeValidator {}
 
 impl Validate for NullTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
@@ -156,6 +160,8 @@ impl BooleanTypeValidator {
     }
 }
 
+impl DeduceType for BooleanTypeValidator {}
+
 impl Validate for BooleanTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         instance.is_boolean()
@@ -207,6 +213,8 @@ impl StringTypeValidator {
         Ok(Box::new(StringTypeValidator { location }))
     }
 }
+
+impl DeduceType for StringTypeValidator {}
 
 impl Validate for StringTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
@@ -260,6 +268,8 @@ impl ArrayTypeValidator {
         Ok(Box::new(ArrayTypeValidator { location }))
     }
 }
+
+impl DeduceType for ArrayTypeValidator {}
 
 impl Validate for ArrayTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
@@ -353,7 +363,9 @@ impl Validate for ObjectTypeValidator {
             )])
         }
     }
+}
 
+impl DeduceType for ObjectTypeValidator {
     fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
         // just define a struct (fields to be defined via other validators)
         Ok(DeducedType::Struct(Box::new(StructType {
@@ -413,6 +425,9 @@ impl Validate for NumberTypeValidator {
             )])
         }
     }
+}
+
+impl DeduceType for NumberTypeValidator {
     fn deduce_type(&self, _type_name: &str) -> DeduceTypeResult<DeducedType> {
         Ok(DeducedType::Number)
     }
@@ -428,6 +443,8 @@ impl IntegerTypeValidator {
         Ok(Box::new(IntegerTypeValidator { location }))
     }
 }
+
+impl DeduceType for IntegerTypeValidator {}
 
 impl Validate for IntegerTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {

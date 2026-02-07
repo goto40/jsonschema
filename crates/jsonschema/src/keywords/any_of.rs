@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{error, no_error, ErrorIterator, ValidationError},
     node::SchemaNode,
     paths::{LazyLocation, Location, RefTracker},
@@ -42,6 +43,8 @@ impl AnyOfValidator {
         }
     }
 }
+
+impl DeduceType for AnyOfValidator {}
 
 impl Validate for AnyOfValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -151,6 +154,8 @@ impl SingleAnyOfValidator {
         }))
     }
 }
+
+impl DeduceType for SingleAnyOfValidator {}
 
 impl Validate for SingleAnyOfValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

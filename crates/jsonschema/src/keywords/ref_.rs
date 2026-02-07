@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ErrorIterator,
     keywords::CompilationResult,
     paths::{LazyLocation, Location, RefTracker},
@@ -23,6 +24,8 @@ struct RefValidator {
     /// Used for computing validator suffixes at runtime.
     ref_target_base: Location,
 }
+
+impl DeduceType for RefValidator {}
 
 impl Validate for RefValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{no_error, ErrorIterator},
     evaluation::Annotations,
     keywords::CompilationResult,
@@ -29,6 +30,7 @@ impl ItemsArrayValidator {
         Ok(Box::new(ItemsArrayValidator { items }))
     }
 }
+impl DeduceType for ItemsArrayValidator {}
 impl Validate for ItemsArrayValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Array(items) = instance {
@@ -107,6 +109,7 @@ impl ItemsObjectValidator {
         Ok(Box::new(ItemsObjectValidator { node }))
     }
 }
+impl DeduceType for ItemsObjectValidator {}
 impl Validate for ItemsObjectValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Array(items) = instance {
@@ -199,6 +202,7 @@ impl ItemsObjectSkipPrefixValidator {
     }
 }
 
+impl DeduceType for ItemsObjectSkipPrefixValidator {}
 impl Validate for ItemsObjectSkipPrefixValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Array(items) = instance {

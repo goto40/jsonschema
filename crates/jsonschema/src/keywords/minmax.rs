@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     ext::numeric,
     keywords::CompilationResult,
@@ -26,6 +27,7 @@ macro_rules! define_numeric_keywords {
                 }
             }
 
+            impl<T> DeduceType for $struct_name<T> {}
             impl<T> Validate for $struct_name<T>
             where
                 T: Copy + Send + Sync + num_traits::ToPrimitive,
@@ -78,6 +80,7 @@ pub(crate) mod bigint_validators {
         numeric, LazyLocation, Location, RefTracker, Validate, ValidationContext, ValidationError,
         Value,
     };
+    use crate::deduced_type::DeduceType;
     use crate::ext::numeric::bignum::{
         f64_ge_bigfrac, f64_ge_bigint, f64_gt_bigfrac, f64_gt_bigint, f64_le_bigfrac,
         f64_le_bigint, f64_lt_bigfrac, f64_lt_bigint, i64_ge_bigfrac, i64_ge_bigint,
@@ -102,6 +105,7 @@ pub(crate) mod bigint_validators {
                 }
             }
 
+            impl DeduceType for $struct_name {}
             impl Validate for $struct_name {
                 fn validate<'i>(
                     &self,
@@ -215,6 +219,7 @@ pub(crate) mod bigint_validators {
                 }
             }
 
+            impl DeduceType for $struct_name {}
             impl Validate for $struct_name {
                 fn validate<'i>(
                     &self,

@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     keywords::CompilationResult,
     options::PatternEngineOptions,
@@ -16,6 +17,8 @@ pub(crate) struct PatternValidator<R> {
     regex: Arc<R>,
     location: Location,
 }
+
+impl<R: RegexEngine> DeduceType for PatternValidator<R> {}
 
 impl<R: RegexEngine> Validate for PatternValidator<R> {
     fn validate<'i>(

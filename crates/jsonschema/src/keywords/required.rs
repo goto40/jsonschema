@@ -1,6 +1,6 @@
 use crate::{
     compiler,
-    deduced_type::{self, DeduceTypeResult, DeducedType, StructType},
+    deduced_type::{self, DeduceType, DeduceTypeResult, DeducedType, StructType},
     error::{no_error, ErrorIterator, ValidationError},
     keywords::CompilationResult,
     paths::{LazyLocation, Location, RefTracker},
@@ -99,26 +99,6 @@ impl Validate for RequiredValidator {
         }
         no_error()
     }
-
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
-        // add required fields (type: Any -> to be refined by other validators)
-        Ok(DeducedType::Struct(Box::new(StructType {
-            name: type_name.to_string(),
-            attributes: self
-                .required
-                .iter()
-                .map(|name| {
-                    (
-                        name.clone(),
-                        deduced_type::StructAttribute {
-                            inner_type: DeducedType::Any,
-                            is_optional: false,
-                        },
-                    )
-                })
-                .collect(),
-        })))
-    }
 }
 
 pub(crate) struct SingleItemRequiredValidator {
@@ -135,6 +115,8 @@ impl SingleItemRequiredValidator {
         }))
     }
 }
+
+impl DeduceType for SingleItemRequiredValidator {}
 
 impl Validate for SingleItemRequiredValidator {
     fn validate<'i>(
@@ -210,6 +192,28 @@ pub(crate) fn compile_with_path(
             schema,
             JsonType::Array,
         ))),
+    }
+}
+
+impl DeduceType for RequiredValidator {
+    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+        // add required fields (type: Any -> to be refined by other validators)
+        Ok(DeducedType::Struct(Box::new(StructType {
+            name: type_name.to_string(),
+            attributes: self
+                .required
+                .iter()
+                .map(|name| {
+                    (
+                        name.clone(),
+                        deduced_type::StructAttribute {
+                            inner_type: DeducedType::Any,
+                            is_optional: false,
+                        },
+                    )
+                })
+                .collect(),
+        })))
     }
 }
 

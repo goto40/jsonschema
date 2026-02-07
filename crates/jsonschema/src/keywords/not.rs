@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     keywords::CompilationResult,
     node::SchemaNode,
@@ -24,6 +25,8 @@ impl NotValidator {
         }))
     }
 }
+
+impl DeduceType for NotValidator {}
 
 impl Validate for NotValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

@@ -12,6 +12,7 @@ use std::sync::{Arc, OnceLock};
 
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     evaluation::ErrorDescription,
     node::SchemaNode,
     paths::{LazyLocation, Location, RefTracker},
@@ -523,6 +524,8 @@ impl UnevaluatedItemsValidator {
         }))
     }
 }
+
+impl DeduceType for UnevaluatedItemsValidator {}
 
 impl Validate for UnevaluatedItemsValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

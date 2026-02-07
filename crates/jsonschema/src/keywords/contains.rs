@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     evaluation::{Annotations, ErrorDescription},
     keywords::CompilationResult,
@@ -26,6 +27,7 @@ impl ContainsValidator {
     }
 }
 
+impl DeduceType for ContainsValidator {}
 impl Validate for ContainsValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Array(items) = instance {
@@ -128,6 +130,8 @@ impl MinContainsValidator {
     }
 }
 
+impl DeduceType for MinContainsValidator {}
+
 impl Validate for MinContainsValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Array(items) = instance {
@@ -210,6 +214,8 @@ impl MaxContainsValidator {
         }))
     }
 }
+
+impl DeduceType for MaxContainsValidator {}
 
 impl Validate for MaxContainsValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -302,6 +308,8 @@ impl MinMaxContainsValidator {
         }))
     }
 }
+
+impl DeduceType for MinMaxContainsValidator {}
 
 impl Validate for MinMaxContainsValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

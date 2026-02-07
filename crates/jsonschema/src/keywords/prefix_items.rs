@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{no_error, ErrorIterator, ValidationError},
     evaluation::Annotations,
     node::SchemaNode,
@@ -31,6 +32,8 @@ impl PrefixItemsValidator {
         Ok(Box::new(PrefixItemsValidator { schemas }))
     }
 }
+
+impl DeduceType for PrefixItemsValidator {}
 
 impl Validate for PrefixItemsValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

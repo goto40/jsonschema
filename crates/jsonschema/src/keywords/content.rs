@@ -3,6 +3,7 @@ use crate::{
     compiler,
     content_encoding::{ContentEncodingCheckType, ContentEncodingConverterType},
     content_media_type::ContentMediaTypeCheckType,
+    deduced_type::DeduceType,
     error::ValidationError,
     keywords::CompilationResult,
     paths::{LazyLocation, Location, RefTracker},
@@ -32,6 +33,8 @@ impl ContentMediaTypeValidator {
         }))
     }
 }
+
+impl DeduceType for ContentMediaTypeValidator {}
 
 /// Validator delegates validation to the stored function.
 impl Validate for ContentMediaTypeValidator {
@@ -88,6 +91,8 @@ impl ContentEncodingValidator {
         }))
     }
 }
+
+impl DeduceType for ContentEncodingValidator {}
 
 impl Validate for ContentEncodingValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
@@ -149,6 +154,8 @@ impl ContentMediaTypeAndEncodingValidator {
         }))
     }
 }
+
+impl DeduceType for ContentMediaTypeAndEncodingValidator {}
 
 /// Decode the input value & check media type
 impl Validate for ContentMediaTypeAndEncodingValidator {

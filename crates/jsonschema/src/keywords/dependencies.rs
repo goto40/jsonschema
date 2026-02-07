@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{no_error, ErrorIterator, ValidationError},
     keywords::{required, unique_items, CompilationResult},
     node::SchemaNode,
@@ -48,6 +49,8 @@ impl DependenciesValidator {
         }
     }
 }
+
+impl DeduceType for DependenciesValidator {}
 
 impl Validate for DependenciesValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -175,6 +178,7 @@ impl DependentRequiredValidator {
         }
     }
 }
+impl DeduceType for DependentRequiredValidator {}
 impl Validate for DependentRequiredValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Object(item) = instance {
@@ -274,6 +278,7 @@ impl DependentSchemasValidator {
         }
     }
 }
+impl DeduceType for DependentSchemasValidator {}
 impl Validate for DependentSchemasValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Object(item) = instance {

@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     ext::numeric,
     keywords::CompilationResult,
@@ -32,6 +33,7 @@ impl MultipleOfFloatValidator {
     }
 }
 
+impl DeduceType for MultipleOfFloatValidator {}
 impl Validate for MultipleOfFloatValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         if let Value::Number(item) = instance {
@@ -97,6 +99,8 @@ impl MultipleOfIntegerValidator {
     }
 }
 
+impl DeduceType for MultipleOfIntegerValidator {}
+
 impl Validate for MultipleOfIntegerValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         if let Value::Number(item) = instance {
@@ -161,6 +165,9 @@ impl MultipleOfBigIntValidator {
         }))
     }
 }
+
+#[cfg(feature = "arbitrary-precision")]
+impl DeduceType for MultipleOfBigIntValidator {}
 
 #[cfg(feature = "arbitrary-precision")]
 impl Validate for MultipleOfBigIntValidator {
@@ -260,6 +267,9 @@ impl MultipleOfBigFracValidator {
         }))
     }
 }
+
+#[cfg(feature = "arbitrary-precision")]
+impl DeduceType for MultipleOfBigFracValidator {}
 
 #[cfg(feature = "arbitrary-precision")]
 impl Validate for MultipleOfBigFracValidator {

@@ -8,7 +8,9 @@
 //! Each valid combination of these keywords has a validator here.
 use crate::{
     compiler,
-    deduced_type::{DeduceTypeError, DeduceTypeResult, DeducedType, StructAttribute, StructType},
+    deduced_type::{
+        DeduceType, DeduceTypeError, DeduceTypeResult, DeducedType, StructAttribute, StructType,
+    },
     error::{no_error, ErrorIterator, ValidationError},
     evaluation::{Annotations, ErrorDescription, EvaluationNode},
     keywords::CompilationResult,
@@ -55,6 +57,9 @@ impl AdditionalPropertiesValidator {
         }))
     }
 }
+
+impl DeduceType for AdditionalPropertiesValidator {}
+
 impl Validate for AdditionalPropertiesValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Object(item) = instance {
@@ -156,6 +161,9 @@ impl AdditionalPropertiesFalseValidator {
         Ok(Box::new(AdditionalPropertiesFalseValidator { location }))
     }
 }
+
+impl DeduceType for AdditionalPropertiesFalseValidator {}
+
 impl Validate for AdditionalPropertiesFalseValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         if let Value::Object(item) = instance {
@@ -205,7 +213,7 @@ impl Validate for AdditionalPropertiesFalseValidator {
 /// }
 /// ```
 pub(crate) struct AdditionalPropertiesNotEmptyFalseValidator<M: PropertiesValidatorsMap> {
-    properties: M,
+    pub properties: M,
     location: Location,
 }
 impl AdditionalPropertiesNotEmptyFalseValidator<SmallValidatorsMap> {
@@ -343,31 +351,6 @@ impl<M: PropertiesValidatorsMap> Validate for AdditionalPropertiesNotEmptyFalseV
             EvaluationResult::valid_empty()
         }
     }
-
-    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
-        let attributes = self
-            .properties
-            .get_keys()
-            .into_iter()
-            .map(|name| -> DeduceTypeResult<(String, StructAttribute)> {
-                let attr = StructAttribute {
-                    inner_type: self
-                        .properties
-                        .get_validator(&name)
-                        .ok_or(DeduceTypeError::unexpected(
-                            "name not found in map (impossible)",
-                        ))?
-                        .deduce_type(&format!("{type_name}_{name}"))?,
-                    is_optional: true,
-                };
-                Ok((name, attr))
-            })
-            .collect::<DeduceTypeResult<HashMap<_, _>>>()?;
-        Ok(DeducedType::Struct(Box::new(StructType {
-            name: type_name.to_string(),
-            attributes,
-        })))
-    }
 }
 
 /// # Schema example
@@ -421,6 +404,9 @@ impl AdditionalPropertiesNotEmptyValidator<BigValidatorsMap> {
         }))
     }
 }
+
+impl<M: PropertiesValidatorsMap> DeduceType for AdditionalPropertiesNotEmptyValidator<M> {}
+
 impl<M: PropertiesValidatorsMap> Validate for AdditionalPropertiesNotEmptyValidator<M> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Object(props) = instance {
@@ -551,6 +537,8 @@ pub(crate) struct AdditionalPropertiesWithPatternsValidator<R> {
     pattern_keyword_path: Location,
     pattern_keyword_absolute_location: Option<Arc<Uri<String>>>,
 }
+
+impl<R: RegexEngine> DeduceType for AdditionalPropertiesWithPatternsValidator<R> {}
 
 impl<R: RegexEngine> Validate for AdditionalPropertiesWithPatternsValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -715,6 +703,8 @@ pub(crate) struct AdditionalPropertiesWithPatternsFalseValidator<R> {
     pattern_keyword_path: Location,
     pattern_keyword_absolute_location: Option<Arc<Uri<String>>>,
 }
+
+impl<R: RegexEngine> DeduceType for AdditionalPropertiesWithPatternsFalseValidator<R> {}
 
 impl<R: RegexEngine> Validate for AdditionalPropertiesWithPatternsFalseValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -900,6 +890,11 @@ pub(crate) struct AdditionalPropertiesWithPatternsNotEmptyValidator<M: Propertie
     node: SchemaNode,
     properties: M,
     patterns: Vec<(R, SchemaNode)>,
+}
+
+impl<M: PropertiesValidatorsMap, R: RegexEngine> DeduceType
+    for AdditionalPropertiesWithPatternsNotEmptyValidator<M, R>
+{
 }
 
 impl<M: PropertiesValidatorsMap, R: RegexEngine> Validate
@@ -1108,6 +1103,11 @@ pub(crate) struct AdditionalPropertiesWithPatternsNotEmptyFalseValidator<
     properties: M,
     patterns: Vec<(R, SchemaNode)>,
     location: Location,
+}
+
+impl<M: PropertiesValidatorsMap, R: RegexEngine> DeduceType
+    for AdditionalPropertiesWithPatternsNotEmptyFalseValidator<M, R>
+{
 }
 
 impl<M: PropertiesValidatorsMap, R: RegexEngine> Validate
@@ -1560,6 +1560,33 @@ pub(crate) fn compile<'a>(
                 }
             }
         }
+    }
+}
+
+impl<M: PropertiesValidatorsMap> DeduceType for AdditionalPropertiesNotEmptyFalseValidator<M> {
+    fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
+        let attributes = self
+            .properties
+            .get_keys()
+            .into_iter()
+            .map(|name| -> DeduceTypeResult<(String, StructAttribute)> {
+                let attr = StructAttribute {
+                    inner_type: self
+                        .properties
+                        .get_validator(&name)
+                        .ok_or(DeduceTypeError::unexpected(
+                            "name not found in map (impossible)",
+                        ))?
+                        .deduce_type(&format!("{type_name}_{name}"))?,
+                    is_optional: true,
+                };
+                Ok((name, attr))
+            })
+            .collect::<DeduceTypeResult<HashMap<_, _>>>()?;
+        Ok(DeducedType::Struct(Box::new(StructType {
+            name: type_name.to_string(),
+            attributes,
+        })))
     }
 }
 

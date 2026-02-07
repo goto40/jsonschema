@@ -12,7 +12,9 @@ use serde_json::{Map, Value};
 use std::sync::{Arc, OnceLock};
 
 use crate::{
-    compiler, ecma,
+    compiler,
+    deduced_type::DeduceType,
+    ecma,
     evaluation::ErrorDescription,
     node::SchemaNode,
     paths::{LazyEvaluationPath, LazyLocation, Location, RefTracker},
@@ -578,6 +580,8 @@ impl UnevaluatedPropertiesValidator {
         }))
     }
 }
+
+impl DeduceType for UnevaluatedPropertiesValidator {}
 
 impl Validate for UnevaluatedPropertiesValidator {
     fn validate<'i>(

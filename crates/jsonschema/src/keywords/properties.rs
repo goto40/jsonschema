@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{no_error, ErrorIterator, ValidationError},
     evaluation::Annotations,
     keywords::CompilationResult,
@@ -40,6 +41,8 @@ impl PropertiesValidator {
         }
     }
 }
+
+impl DeduceType for PropertiesValidator {}
 
 impl Validate for PropertiesValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

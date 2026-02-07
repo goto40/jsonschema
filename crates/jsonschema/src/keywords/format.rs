@@ -13,7 +13,9 @@ use unicode_general_category::{get_general_category, GeneralCategory};
 use uuid_simd::{parse_hyphenated, Out};
 
 use crate::{
-    compiler, ecma,
+    compiler,
+    deduced_type::DeduceType,
+    ecma,
     error::ValidationError,
     keywords::CompilationResult,
     paths::{LazyLocation, Location, RefTracker},
@@ -720,6 +722,8 @@ macro_rules! format_validators {
                 }
             }
 
+            impl DeduceType for $validator {}
+
             impl Validate for $validator {
                 fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
                     if let Value::String(item) = instance {
@@ -801,6 +805,7 @@ impl EmailValidator {
         }))
     }
 }
+impl DeduceType for EmailValidator {}
 
 impl Validate for EmailValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
@@ -849,6 +854,8 @@ impl IdnEmailValidator {
         }))
     }
 }
+
+impl DeduceType for IdnEmailValidator {}
 
 impl Validate for IdnEmailValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
@@ -901,6 +908,7 @@ impl CustomFormatValidator {
     }
 }
 
+impl DeduceType for CustomFormatValidator {}
 impl Validate for CustomFormatValidator {
     fn validate<'i>(
         &self,

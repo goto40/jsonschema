@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{no_error, ErrorIterator, ValidationError},
     keywords::{boolean::FalseValidator, CompilationResult},
     node::SchemaNode,
@@ -27,6 +28,9 @@ impl AdditionalItemsObjectValidator {
         }))
     }
 }
+
+impl DeduceType for AdditionalItemsObjectValidator {}
+
 impl Validate for AdditionalItemsObjectValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
         if let Value::Array(items) = instance {
@@ -76,6 +80,8 @@ impl Validate for AdditionalItemsObjectValidator {
         }
     }
 }
+
+impl DeduceType for AdditionalItemsBooleanValidator {}
 
 pub(crate) struct AdditionalItemsBooleanValidator {
     items_count: usize,

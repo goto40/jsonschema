@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     ext::cmp,
     keywords::CompilationResult,
@@ -107,6 +108,8 @@ impl UniqueItemsValidator {
         Ok(Box::new(UniqueItemsValidator { location }))
     }
 }
+
+impl DeduceType for UniqueItemsValidator {}
 
 impl Validate for UniqueItemsValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {

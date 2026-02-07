@@ -1,3 +1,4 @@
+use crate::deduced_type::DeduceType;
 use crate::paths::{LazyLocation, Location, RefTracker};
 
 use crate::{
@@ -16,6 +17,9 @@ impl FalseValidator {
         Ok(Box::new(FalseValidator { location }))
     }
 }
+
+impl DeduceType for FalseValidator {}
+
 impl Validate for FalseValidator {
     fn is_valid(&self, _: &Value, _ctx: &mut ValidationContext) -> bool {
         false

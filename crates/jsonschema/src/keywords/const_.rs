@@ -1,5 +1,6 @@
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     ext::cmp,
     keywords::CompilationResult,
@@ -23,6 +24,8 @@ impl ConstArrayValidator {
         }))
     }
 }
+impl DeduceType for ConstArrayValidator {}
+
 impl Validate for ConstArrayValidator {
     fn validate<'i>(
         &self,
@@ -64,6 +67,7 @@ impl ConstBooleanValidator {
         Ok(Box::new(ConstBooleanValidator { value, location }))
     }
 }
+impl DeduceType for ConstBooleanValidator {}
 impl Validate for ConstBooleanValidator {
     fn validate<'i>(
         &self,
@@ -104,6 +108,7 @@ impl ConstNullValidator {
         Ok(Box::new(ConstNullValidator { location }))
     }
 }
+impl DeduceType for ConstNullValidator {}
 impl Validate for ConstNullValidator {
     fn validate<'i>(
         &self,
@@ -144,6 +149,7 @@ impl ConstNumberValidator {
         }))
     }
 }
+impl DeduceType for ConstNumberValidator {}
 
 impl Validate for ConstNumberValidator {
     fn validate<'i>(
@@ -191,6 +197,8 @@ impl ConstObjectValidator {
     }
 }
 
+impl DeduceType for ConstObjectValidator {}
+
 impl Validate for ConstObjectValidator {
     fn validate<'i>(
         &self,
@@ -236,6 +244,7 @@ impl ConstStringValidator {
         }))
     }
 }
+impl DeduceType for ConstStringValidator {}
 
 impl Validate for ConstStringValidator {
     fn validate<'i>(

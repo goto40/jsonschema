@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::{no_error, ErrorIterator, ValidationError},
     evaluation::Annotations,
     keywords::CompilationResult,
@@ -17,6 +18,8 @@ use serde_json::{Map, Value};
 pub(crate) struct PatternPropertiesValidator<R> {
     patterns: Vec<(Arc<R>, SchemaNode)>,
 }
+
+impl<R: RegexEngine> DeduceType for PatternPropertiesValidator<R> {}
 
 impl<R: RegexEngine> Validate for PatternPropertiesValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -116,6 +119,8 @@ pub(crate) struct SingleValuePatternPropertiesValidator<R> {
     regex: Arc<R>,
     node: SchemaNode,
 }
+
+impl<R: RegexEngine> DeduceType for SingleValuePatternPropertiesValidator<R> {}
 
 impl<R: RegexEngine> Validate for SingleValuePatternPropertiesValidator<R> {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {

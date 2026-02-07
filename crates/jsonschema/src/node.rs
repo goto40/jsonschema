@@ -1,6 +1,6 @@
 use crate::{
     compiler::Context,
-    deduced_type::{DeduceTypeError, DeduceTypeResult, DeducedType},
+    deduced_type::{combine, DeduceType, DeduceTypeError, DeduceTypeResult, DeducedType},
     error::ErrorIterator,
     evaluation::{Annotations, EvaluationNode},
     keywords::{BoxedValidator, Keyword},
@@ -76,12 +76,12 @@ struct KeywordValidators {
     validators: Vec<KeywordValidatorEntry>,
 }
 
-impl KeywordValidators {
+impl DeduceType for KeywordValidators {
     fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
         self.validators
             .iter()
             .map(|k| k.validator.deduce_type(type_name))
-            .reduce(|acc, curr| acc?.combine(&curr?))
+            .reduce(|acc, curr| combine(&acc?, &curr?))
             .unwrap_or(Err(DeduceTypeError::unexpected(
                 "KeywordValidators::deduce_type w/o any inner validator",
             )))
@@ -155,6 +155,8 @@ impl PendingTarget {
         }
     }
 }
+
+impl DeduceType for PendingSchemaNode {}
 
 impl Validate for PendingSchemaNode {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -587,7 +589,9 @@ impl Validate for SchemaNode {
             }
         }
     }
+}
 
+impl DeduceType for SchemaNode {
     fn deduce_type(&self, type_name: &str) -> DeduceTypeResult<DeducedType> {
         match self.validators.as_ref() {
             NodeValidators::Boolean { validator: _ } => {

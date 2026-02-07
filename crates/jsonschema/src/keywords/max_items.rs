@@ -2,6 +2,7 @@
 
 use crate::{
     compiler,
+    deduced_type::DeduceType,
     error::ValidationError,
     keywords::{helpers::fail_on_non_positive_integer, CompilationResult},
     paths::{LazyLocation, Location, RefTracker},
@@ -40,6 +41,7 @@ impl MaxItemsValidator {
     }
 }
 
+impl DeduceType for MaxItemsValidator {}
 impl Validate for MaxItemsValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
         if let Value::Array(items) = instance {
