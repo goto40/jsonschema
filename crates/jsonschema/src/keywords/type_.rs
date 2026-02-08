@@ -106,7 +106,11 @@ impl NullTypeValidator {
     }
 }
 
-impl DeduceType for NullTypeValidator {}
+impl DeduceType for NullTypeValidator {
+    fn deduce_type(&self, _type_name: &[String]) -> DeduceTypeResult<DeducedType> {
+        Ok(DeducedType::Null)
+    }
+}
 
 impl Validate for NullTypeValidator {
     fn is_valid(&self, instance: &Value, _ctx: &mut ValidationContext) -> bool {
@@ -603,7 +607,10 @@ fn compile_single_type<'a>(
 
 #[cfg(test)]
 mod tests {
-    use crate::tests_util;
+    use crate::{
+        deduced_type::{deduce_type, DeducedType},
+        tests_util,
+    };
     use serde_json::{json, Value};
     use test_case::test_case;
 
@@ -722,5 +729,42 @@ mod tests {
                 tests_util::is_not_valid(&schema, &instance);
             }
         }
+    }
+
+    #[test]
+    fn deduce_type_null() {
+        assert_eq!(
+            deduce_type(
+                &json!({
+                    "type": "null"
+                }),
+                "myname"
+            ),
+            Ok(DeducedType::Null)
+        );
+    }
+    #[test]
+    fn deduce_type_integer() {
+        assert_eq!(
+            deduce_type(
+                &json!({
+                    "type": "integer"
+                }),
+                "myname"
+            ),
+            Ok(DeducedType::Integer)
+        );
+    }
+    #[test]
+    fn deduce_type_number() {
+        assert_eq!(
+            deduce_type(
+                &json!({
+                    "type": "number"
+                }),
+                "myname"
+            ),
+            Ok(DeducedType::Number)
+        );
     }
 }

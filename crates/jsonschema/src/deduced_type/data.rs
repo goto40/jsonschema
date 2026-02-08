@@ -10,6 +10,7 @@ pub enum DeducedType {
     Struct(Box<StructType>),
     Variant(Box<VariantType>),
     Any,
+    Null,
 }
 
 impl DeducedType {
@@ -24,6 +25,7 @@ impl DeducedType {
             DeducedType::Struct(_) => 6,
             DeducedType::Variant(_) => 7,
             DeducedType::Any => 8,
+            DeducedType::Null => 9,
         }
     }
 }
