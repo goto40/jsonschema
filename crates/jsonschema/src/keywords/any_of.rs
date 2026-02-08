@@ -182,7 +182,7 @@ impl DeduceType for SingleAnyOfValidator {
             name: type_name.to_vec(),
             possible_types: [&self.node]
                 .iter()
-                .map(|v| v.deduce_type(&add_names(type_name, &format!("@any"))))
+                .map(|v| v.deduce_type(&add_names(type_name, "@any")))
                 .collect::<DeduceTypeResult<Vec<_>>>()?,
         })))
     }
