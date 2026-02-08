@@ -72,16 +72,30 @@ fn add_to_variant(v: &VariantType, other: &DeducedType) -> DeducedType {
     if v.possible_types.iter().any(|t| t == other) {
         return DeducedType::Variant(Box::new(v.clone()));
     }
-    let mut possible_types = [other]
-        .into_iter()
-        .chain(v.possible_types.iter())
-        .cloned()
-        .collect::<Vec<_>>();
-    possible_types.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less));
+    let possible_types = if let DeducedType::Variant(other) = other {
+        other
+            .possible_types
+            .iter()
+            .chain(v.possible_types.iter())
+            .cloned()
+            .collect::<Vec<_>>()
+    } else {
+        [other]
+            .into_iter()
+            .chain(v.possible_types.iter())
+            .cloned()
+            .collect::<Vec<_>>()
+    };
+    let possible_types = sort_deduced_types(possible_types);
     DeducedType::Variant(Box::new(VariantType {
         name: v.name.clone(),
         possible_types,
     }))
+}
+
+pub(crate) fn sort_deduced_types(mut lst: Vec<DeducedType>) -> Vec<DeducedType> {
+    lst.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less));
+    lst
 }
 
 /// # Errors

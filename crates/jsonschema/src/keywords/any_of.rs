@@ -1,6 +1,8 @@
 use crate::{
     compiler,
-    deduced_type::DeduceType,
+    deduced_type::{
+        add_names, sort_deduced_types, DeduceType, DeduceTypeResult, DeducedType, VariantType,
+    },
     error::{error, no_error, ErrorIterator, ValidationError},
     node::SchemaNode,
     paths::{LazyLocation, Location, RefTracker},
@@ -44,7 +46,23 @@ impl AnyOfValidator {
     }
 }
 
-impl DeduceType for AnyOfValidator {}
+impl DeduceType for AnyOfValidator {
+    fn deduce_type(
+        &self,
+        type_name: &[String],
+    ) -> crate::deduced_type::DeduceTypeResult<crate::deduced_type::DeducedType> {
+        Ok(DeducedType::Variant(Box::new(VariantType {
+            name: type_name.to_vec(),
+            possible_types: sort_deduced_types(
+                self.schemas
+                    .iter()
+                    .enumerate()
+                    .map(|(idx, v)| v.deduce_type(&add_names(type_name, &format!("@any_{idx}"))))
+                    .collect::<DeduceTypeResult<Vec<_>>>()?,
+            ),
+        })))
+    }
+}
 
 impl Validate for AnyOfValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -155,7 +173,20 @@ impl SingleAnyOfValidator {
     }
 }
 
-impl DeduceType for SingleAnyOfValidator {}
+impl DeduceType for SingleAnyOfValidator {
+    fn deduce_type(
+        &self,
+        type_name: &[String],
+    ) -> crate::deduced_type::DeduceTypeResult<crate::deduced_type::DeducedType> {
+        Ok(DeducedType::Variant(Box::new(VariantType {
+            name: type_name.to_vec(),
+            possible_types: [&self.node]
+                .iter()
+                .map(|v| v.deduce_type(&add_names(type_name, &format!("@any"))))
+                .collect::<DeduceTypeResult<Vec<_>>>()?,
+        })))
+    }
+}
 
 impl Validate for SingleAnyOfValidator {
     fn is_valid(&self, instance: &Value, ctx: &mut ValidationContext) -> bool {
@@ -247,7 +278,10 @@ pub(crate) fn compile<'a>(
 
 #[cfg(test)]
 mod tests {
-    use crate::tests_util;
+    use crate::{
+        deduced_type::{deduce_type, DeducedType, VariantType},
+        tests_util,
+    };
     use serde_json::{json, Value};
     use test_case::test_case;
 
@@ -255,5 +289,26 @@ mod tests {
     #[test_case(&json!({"anyOf": [{"type": "integer"}, {"type": "string"}]}), &json!({}), "/anyOf")]
     fn location(schema: &Value, instance: &Value, expected: &str) {
         tests_util::assert_schema_location(schema, instance, expected);
+    }
+
+    #[test]
+    fn deduce_type_test() {
+        assert_eq!(
+            deduce_type(&json!({"anyOf": [{"type": "string"}]}), "myname"),
+            Ok(DeducedType::Variant(Box::new(VariantType {
+                name: vec!["myname".to_owned()],
+                possible_types: vec![DeducedType::String]
+            })))
+        );
+        assert_eq!(
+            deduce_type(
+                &json!({"anyOf": [{"type": "integer"}, {"type": "string"}]}),
+                "myname"
+            ),
+            Ok(DeducedType::Variant(Box::new(VariantType {
+                name: vec!["myname".to_owned()],
+                possible_types: vec![DeducedType::String, DeducedType::Integer]
+            })))
+        );
     }
 }
